@@ -6,6 +6,7 @@ import UniformTypeIdentifiers
 public class DocumentManager: ObservableObject {
     @Published public var tabs: [DocumentTab] = []
     @Published public var selectedTabID: UUID?
+    private var watchers: [UUID: FileWatcher] = [:]
 
     public init() {}
 
@@ -23,10 +24,16 @@ public class DocumentManager: ObservableObject {
         let tab = DocumentTab(fileURL: url, content: content)
         tabs.append(tab)
         selectedTabID = tab.id
+        let tabID = tab.id
+        watchers[tabID] = FileWatcher(url: url) { [weak self] in
+            self?.reloadFile(id: tabID)
+        }
     }
 
     public func closeTab(id: UUID) {
         guard let index = tabs.firstIndex(where: { $0.id == id }) else { return }
+        watchers[id]?.stop()
+        watchers[id] = nil
         tabs.remove(at: index)
         if selectedTabID == id {
             if !tabs.isEmpty {
