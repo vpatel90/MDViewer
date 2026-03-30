@@ -7,7 +7,7 @@ struct MDViewerApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        WindowGroup {
+        Window("MDViewer", id: "main") {
             ContentView()
                 .environmentObject(manager)
                 .onAppear {
@@ -16,6 +16,7 @@ struct MDViewerApp: App {
         }
         .defaultSize(width: 900, height: 700)
         .commands {
+            // Remove "New Window" from the File menu
             CommandGroup(replacing: .newItem) {
                 Button("Open...") {
                     manager.openFileDialog()
@@ -32,6 +33,9 @@ struct MDViewerApp: App {
                 .keyboardShortcut("w")
                 .disabled(manager.tabs.isEmpty)
             }
+
+            // Remove "New Window" from Window menu
+            CommandGroup(replacing: .singleWindowList) {}
 
             CommandGroup(after: .toolbar) {
                 Button("Next Tab") {
@@ -53,8 +57,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var manager: DocumentManager?
 
     func application(_ application: NSApplication, open urls: [URL]) {
+        // Bring existing window to front
+        NSApp.windows.first { $0.isVisible }?.makeKeyAndOrderFront(nil)
         for url in urls {
             manager?.openFile(url: url)
         }
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag {
+            NSApp.windows.first?.makeKeyAndOrderFront(nil)
+        }
+        return true
     }
 }
