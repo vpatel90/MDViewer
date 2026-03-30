@@ -194,19 +194,18 @@
     }
 
     .mermaid {
-        display: flex;
-        justify-content: center;
-        margin: 1.5em 0;
-        padding: 1.5em 1em;
+        margin: 1.5em -40px;
+        padding: 1.5em 2em;
         background: var(--code-bg);
-        border: 1px solid var(--code-border);
-        border-radius: 8px;
+        border-top: 1px solid var(--code-border);
+        border-bottom: 1px solid var(--code-border);
         overflow-x: auto;
+        text-align: center;
     }
 
     .mermaid svg {
-        max-width: 100%;
         height: auto;
+        max-width: none;
     }
 
     dl { margin-bottom: 1em; }
@@ -257,7 +256,7 @@
         fontFamily: mermaidFont,
         flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis', padding: 15 },
         sequence: { useMaxWidth: true, mirrorActors: false, actorMargin: 80, messageFontSize: 13 },
-        gantt: { useMaxWidth: true },
+        gantt: { useMaxWidth: false },
         themeVariables: {
             fontSize: '13px',
             primaryColor: '#dbeafe',
@@ -296,7 +295,7 @@
         fontFamily: mermaidFont,
         flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis', padding: 15 },
         sequence: { useMaxWidth: true, mirrorActors: false, actorMargin: 80, messageFontSize: 13 },
-        gantt: { useMaxWidth: true },
+        gantt: { useMaxWidth: false },
         themeVariables: {
             fontSize: '13px',
             primaryColor: '#1e3a5f',
