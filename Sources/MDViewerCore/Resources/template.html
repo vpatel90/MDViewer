@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    :root {
+        --text: #24292f;
+        --bg: #ffffff;
+        --border: #d0d7de;
+        --code-bg: #f6f8fa;
+        --code-border: #d0d7de;
+        --link: #0969da;
+        --blockquote-border: #d0d7de;
+        --blockquote-text: #656d76;
+        --table-border: #d0d7de;
+        --table-alt: #f6f8fa;
+        --heading-text: #1f2328;
+        --kbd-bg: #f6f8fa;
+        --kbd-border: #d0d7de;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+        font-size: 16px;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+        font-size: 1rem;
+        line-height: 1.7;
+        color: var(--text);
+        background: var(--bg);
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 32px 40px 80px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        word-wrap: break-word;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--heading-text);
+        font-weight: 600;
+        line-height: 1.25;
+        margin-top: 1.5em;
+        margin-bottom: 0.625em;
+    }
+
+    h1 {
+        font-size: 2em;
+        padding-bottom: 0.3em;
+        border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+        font-size: 1.5em;
+        padding-bottom: 0.3em;
+        border-bottom: 1px solid var(--border);
+    }
+
+    h3 { font-size: 1.25em; }
+    h4 { font-size: 1em; }
+    h5 { font-size: 0.875em; }
+    h6 { font-size: 0.85em; color: var(--blockquote-text); }
+
+    h1:first-child, h2:first-child, h3:first-child { margin-top: 0; }
+
+    p { margin-bottom: 1em; }
+
+    a { color: var(--link); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    strong { font-weight: 600; }
+
+    img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 6px;
+    }
+
+    hr {
+        border: none;
+        border-top: 2px solid var(--border);
+        margin: 1.5em 0;
+    }
+
+    code {
+        font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+        font-size: 0.85em;
+        background: var(--code-bg);
+        padding: 0.2em 0.4em;
+        border-radius: 6px;
+        border: 1px solid var(--code-border);
+    }
+
+    pre {
+        background: var(--code-bg);
+        border: 1px solid var(--code-border);
+        border-radius: 8px;
+        padding: 16px;
+        overflow-x: auto;
+        margin-bottom: 1em;
+        line-height: 1.5;
+    }
+
+    pre code {
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 0.85em;
+        border-radius: 0;
+    }
+
+    blockquote {
+        border-left: 4px solid var(--blockquote-border);
+        padding: 0.25em 1em;
+        margin-bottom: 1em;
+        color: var(--blockquote-text);
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+    blockquote blockquote { margin-top: 0.5em; }
+
+    ul, ol {
+        padding-left: 2em;
+        margin-bottom: 1em;
+    }
+    li { margin-bottom: 0.25em; }
+    li > p { margin-bottom: 0.5em; }
+    li > ul, li > ol { margin-bottom: 0; margin-top: 0.25em; }
+
+    ul.contains-task-list {
+        list-style: none;
+        padding-left: 1.5em;
+    }
+    li.task-list-item { position: relative; }
+    li.task-list-item input[type="checkbox"] {
+        margin-right: 0.5em;
+        margin-left: -1.3em;
+        position: relative;
+        top: 1px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1em;
+        overflow-x: auto;
+        display: block;
+    }
+    th, td {
+        border: 1px solid var(--table-border);
+        padding: 8px 13px;
+        text-align: left;
+    }
+    th {
+        font-weight: 600;
+        background: var(--code-bg);
+    }
+    tr:nth-child(2n) { background: var(--table-alt); }
+
+    kbd {
+        display: inline-block;
+        padding: 3px 5px;
+        font-size: 0.75em;
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        line-height: 1;
+        color: var(--text);
+        background: var(--kbd-bg);
+        border: 1px solid var(--kbd-border);
+        border-radius: 6px;
+        box-shadow: inset 0 -1px 0 var(--kbd-border);
+    }
+
+    .mermaid {
+        display: flex;
+        justify-content: center;
+        margin: 1.5em 0;
+        padding: 1.5em 1em;
+        background: var(--code-bg);
+        border: 1px solid var(--code-border);
+        border-radius: 8px;
+        overflow-x: auto;
+    }
+
+    .mermaid svg {
+        max-width: 100%;
+        height: auto;
+    }
+
+    dl { margin-bottom: 1em; }
+    dt { font-weight: 600; margin-top: 0.5em; }
+    dd { margin-left: 2em; }
+
+    .footnotes { font-size: 0.85em; margin-top: 2em; border-top: 1px solid var(--border); padding-top: 1em; }
+    .footnotes ol { padding-left: 1.5em; }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+</style>
+</head>
+<body>
+<div id="content"></div>
+
+<script src="markdown-it.min.js"></script>
+<script src="mermaid.min.js"></script>
+<script>
+    // Initialize markdown-it
+    const md = window.markdownit({
+        html: true,
+        linkify: true,
+        typographer: true
+    });
+
+    // Custom fence renderer: mermaid code blocks → <div class="mermaid">
+    const defaultFence = md.renderer.rules.fence;
+    md.renderer.rules.fence = function(tokens, idx, options, env, self) {
+        const token = tokens[idx];
+        if (token.info.trim().toLowerCase() === 'mermaid') {
+            return '<div class="mermaid">' + md.utils.escapeHtml(token.content) + '</div>';
+        }
+        if (defaultFence) {
+            return defaultFence.call(this, tokens, idx, options, env, self);
+        }
+        return self.renderToken(tokens, idx, options);
+    };
+
+    // Initialize mermaid
+    mermaid.initialize({
+        startOnLoad: false,
+        theme: 'neutral',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
+        flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+        sequence: { useMaxWidth: true, mirrorActors: false },
+        gantt: { useMaxWidth: true },
+        themeVariables: {
+            fontSize: '14px',
+            primaryColor: '#dbeafe',
+            primaryBorderColor: '#93c5fd',
+            primaryTextColor: '#1e3a5f',
+            lineColor: '#6b7280',
+            secondaryColor: '#f3e8ff',
+            tertiaryColor: '#ecfdf5'
+        }
+    });
+
+    // Main render function — called from Swift via evaluateJavaScript
+    async function renderMarkdown(text) {
+        const html = md.render(text);
+        document.getElementById('content').innerHTML = html;
+
+        const mermaidDivs = document.querySelectorAll('.mermaid');
+        if (mermaidDivs.length > 0) {
+            try {
+                await mermaid.run({ querySelector: '.mermaid' });
+            } catch(e) {
+                console.error('Mermaid rendering error:', e);
+            }
+        }
+
+        window.scrollTo(0, 0);
+    }
+
+    window.templateReady = true;
+</script>
+</body>
+</html>
