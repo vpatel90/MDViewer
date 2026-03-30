@@ -56,6 +56,8 @@ cat > "$APP_DIR/Info.plist" << 'PLIST'
     <string>14.0</string>
     <key>NSHighResolutionCapable</key>
     <true/>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>CFBundleDocumentTypes</key>
     <array>
         <dict>
@@ -86,6 +88,12 @@ cat > "$APP_DIR/Info.plist" << 'PLIST'
 </dict>
 </plist>
 PLIST
+
+# Copy app icon from resource bundle into Resources/
+if [ -n "$RESOURCE_BUNDLE" ] && [ -f "$RESOURCE_BUNDLE/Resources/AppIcon.icns" ]; then
+    cp "$RESOURCE_BUNDLE/Resources/AppIcon.icns" "$APP_DIR/Resources/"
+    echo "Copied app icon"
+fi
 
 # Ad-hoc code sign
 # Note: --deep signing requires all sub-bundles to have Info.plist files.
