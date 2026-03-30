@@ -248,47 +248,151 @@
         return self.renderToken(tokens, idx, options);
     };
 
-    // Initialize mermaid
-    mermaid.initialize({
+    // Mermaid theme configs
+    const mermaidFont = '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif';
+
+    const lightMermaidConfig = {
         startOnLoad: false,
-        theme: 'neutral',
-        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
-        flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
-        sequence: { useMaxWidth: true, mirrorActors: false },
+        theme: 'base',
+        fontFamily: mermaidFont,
+        flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis', padding: 15 },
+        sequence: { useMaxWidth: true, mirrorActors: false, actorMargin: 80, messageFontSize: 13 },
         gantt: { useMaxWidth: true },
         themeVariables: {
-            fontSize: '14px',
+            fontSize: '13px',
             primaryColor: '#dbeafe',
             primaryBorderColor: '#93c5fd',
             primaryTextColor: '#1e3a5f',
-            lineColor: '#6b7280',
-            secondaryColor: '#f3e8ff',
-            tertiaryColor: '#ecfdf5'
+            lineColor: '#94a3b8',
+            secondaryColor: '#ede9fe',
+            secondaryBorderColor: '#c4b5fd',
+            secondaryTextColor: '#3b0764',
+            tertiaryColor: '#ecfdf5',
+            tertiaryBorderColor: '#86efac',
+            tertiaryTextColor: '#064e3b',
+            noteBkgColor: '#fef9c3',
+            noteBorderColor: '#fde68a',
+            noteTextColor: '#713f12',
+            actorBkg: '#dbeafe',
+            actorBorder: '#93c5fd',
+            actorTextColor: '#1e3a5f',
+            actorLineColor: '#94a3b8',
+            signalColor: '#334155',
+            signalTextColor: '#334155',
+            labelBoxBkgColor: '#f1f5f9',
+            labelBoxBorderColor: '#cbd5e1',
+            labelTextColor: '#334155',
+            loopTextColor: '#475569',
+            activationBorderColor: '#93c5fd',
+            activationBkgColor: '#dbeafe',
+            sequenceNumberColor: '#ffffff',
+            nodeTextColor: '#1e3a5f',
         }
-    });
+    };
+
+    const darkMermaidConfig = {
+        startOnLoad: false,
+        theme: 'base',
+        fontFamily: mermaidFont,
+        flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis', padding: 15 },
+        sequence: { useMaxWidth: true, mirrorActors: false, actorMargin: 80, messageFontSize: 13 },
+        gantt: { useMaxWidth: true },
+        themeVariables: {
+            fontSize: '13px',
+            primaryColor: '#1e3a5f',
+            primaryBorderColor: '#3b82f6',
+            primaryTextColor: '#e0ecff',
+            lineColor: '#64748b',
+            secondaryColor: '#2e1065',
+            secondaryBorderColor: '#7c3aed',
+            secondaryTextColor: '#e0d4ff',
+            tertiaryColor: '#064e3b',
+            tertiaryBorderColor: '#34d399',
+            tertiaryTextColor: '#d1fae5',
+            noteBkgColor: '#422006',
+            noteBorderColor: '#a16207',
+            noteTextColor: '#fef3c7',
+            actorBkg: '#1e3a5f',
+            actorBorder: '#3b82f6',
+            actorTextColor: '#e0ecff',
+            actorLineColor: '#64748b',
+            signalColor: '#cbd5e1',
+            signalTextColor: '#cbd5e1',
+            labelBoxBkgColor: '#1e293b',
+            labelBoxBorderColor: '#475569',
+            labelTextColor: '#cbd5e1',
+            loopTextColor: '#94a3b8',
+            activationBorderColor: '#3b82f6',
+            activationBkgColor: '#1e3a5f',
+            sequenceNumberColor: '#ffffff',
+            nodeTextColor: '#e0ecff',
+            mainBkg: '#1e293b',
+            nodeBorder: '#475569',
+            clusterBkg: '#1e293b',
+            clusterBorder: '#475569',
+            titleColor: '#e2e8f0',
+            edgeLabelBackground: '#1e293b',
+            background: '#0d1117',
+        }
+    };
+
+    let currentDarkMode = false;
+    let currentMarkdownText = '';
+
+    function initMermaid(isDark) {
+        mermaid.initialize(isDark ? darkMermaidConfig : lightMermaidConfig);
+    }
+
+    initMermaid(false);
 
     // Main render function — called from Swift via evaluateJavaScript
     async function renderMarkdown(text) {
+        currentMarkdownText = text;
         const html = md.render(text);
         document.getElementById('content').innerHTML = html;
+        await renderMermaidDiagrams();
+        window.scrollTo(0, 0);
+    }
 
+    async function renderMermaidDiagrams() {
         const mermaidDivs = document.querySelectorAll('.mermaid');
         if (mermaidDivs.length > 0) {
+            // Reset any previously rendered diagrams
+            mermaidDivs.forEach(div => {
+                if (div.getAttribute('data-processed')) {
+                    const code = div.getAttribute('data-original') || div.textContent;
+                    div.removeAttribute('data-processed');
+                    div.innerHTML = code;
+                }
+                // Store original source for re-renders
+                if (!div.getAttribute('data-original')) {
+                    div.setAttribute('data-original', div.textContent);
+                }
+            });
             try {
                 await mermaid.run({ querySelector: '.mermaid' });
             } catch(e) {
                 console.error('Mermaid rendering error:', e);
             }
         }
-
-        window.scrollTo(0, 0);
     }
 
-    function setDarkMode(isDark) {
+    async function setDarkMode(isDark) {
         if (isDark) {
             document.body.classList.add('dark');
         } else {
             document.body.classList.remove('dark');
+        }
+        if (isDark !== currentDarkMode) {
+            currentDarkMode = isDark;
+            initMermaid(isDark);
+            // Re-render mermaid with new theme if we have content
+            if (currentMarkdownText) {
+                // Re-parse and re-render to get fresh mermaid divs
+                const html = md.render(currentMarkdownText);
+                document.getElementById('content').innerHTML = html;
+                await renderMermaidDiagrams();
+            }
         }
     }
 
