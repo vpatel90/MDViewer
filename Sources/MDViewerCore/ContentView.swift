@@ -3,6 +3,7 @@ import UniformTypeIdentifiers
 
 public struct ContentView: View {
     @EnvironmentObject var manager: DocumentManager
+    @AppStorage("isDarkMode") private var isDarkMode = false
 
     public init() {}
 
@@ -12,11 +13,27 @@ public struct ContentView: View {
                 EmptyStateView()
                     .environmentObject(manager)
             } else {
-                TabBarView()
-                    .environmentObject(manager)
+                HStack(spacing: 0) {
+                    TabBarView()
+                        .environmentObject(manager)
+
+                    Spacer()
+
+                    Toggle(isOn: $isDarkMode) {
+                        Image(systemName: isDarkMode ? "moon.fill" : "sun.max.fill")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
+                    }
+                    .toggleStyle(.switch)
+                    .controlSize(.mini)
+                    .padding(.trailing, 12)
+                }
+                .frame(height: 36)
+                .background(Color(nsColor: .windowBackgroundColor).opacity(0.95))
+                .overlay(Divider(), alignment: .bottom)
 
                 if let tab = manager.selectedTab {
-                    MarkdownWebView(content: tab.content)
+                    MarkdownWebView(content: tab.content, isDarkMode: isDarkMode)
                         .id(tab.id)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
@@ -25,7 +42,7 @@ public struct ContentView: View {
             }
         }
         .frame(minWidth: 600, minHeight: 400)
-        .background(Color(nsColor: .textBackgroundColor))
+        .background(isDarkMode ? Color(nsColor: .windowBackgroundColor) : Color(nsColor: .textBackgroundColor))
         .onDrop(of: [.fileURL], isTargeted: nil, perform: handleDrop)
         .navigationTitle(manager.selectedTab?.filename ?? "MDViewer")
     }

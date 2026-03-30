@@ -20,6 +20,25 @@
         --kbd-border: #d0d7de;
     }
 
+    body.dark {
+        --text: #e6edf3;
+        --bg: #0d1117;
+        --border: #30363d;
+        --code-bg: #161b22;
+        --code-border: #30363d;
+        --link: #58a6ff;
+        --blockquote-border: #30363d;
+        --blockquote-text: #8b949e;
+        --table-border: #30363d;
+        --table-alt: #161b22;
+        --heading-text: #f0f6fc;
+        --kbd-bg: #161b22;
+        --kbd-border: #30363d;
+    }
+
+    body.dark ::-webkit-scrollbar-thumb { background: #484f58; }
+    body.dark ::-webkit-scrollbar-thumb:hover { background: #6e7681; }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     html {
@@ -263,6 +282,14 @@
         }
 
         window.scrollTo(0, 0);
+    }
+
+    function setDarkMode(isDark) {
+        if (isDark) {
+            document.body.classList.add('dark');
+        } else {
+            document.body.classList.remove('dark');
+        }
     }
 
     window.templateReady = true;

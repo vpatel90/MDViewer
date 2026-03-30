@@ -8,7 +8,32 @@ public class DocumentManager: ObservableObject {
     @Published public var selectedTabID: UUID?
     private var watchers: [UUID: FileWatcher] = [:]
 
-    public init() {}
+    private static let sessionURLsKey = "sessionFileURLs"
+    private static let sessionSelectedKey = "sessionSelectedURL"
+
+    public init() {
+        restoreSession()
+    }
+
+    private func restoreSession() {
+        guard let paths = UserDefaults.standard.stringArray(forKey: Self.sessionURLsKey) else { return }
+        let selectedPath = UserDefaults.standard.string(forKey: Self.sessionSelectedKey)
+        for path in paths {
+            let url = URL(fileURLWithPath: path)
+            guard FileManager.default.fileExists(atPath: path) else { continue }
+            openFile(url: url)
+        }
+        if let selectedPath = selectedPath,
+           let tab = tabs.first(where: { $0.fileURL.path == selectedPath }) {
+            selectedTabID = tab.id
+        }
+    }
+
+    private func saveSession() {
+        let paths = tabs.map { $0.fileURL.path }
+        UserDefaults.standard.set(paths, forKey: Self.sessionURLsKey)
+        UserDefaults.standard.set(selectedTab?.fileURL.path, forKey: Self.sessionSelectedKey)
+    }
 
     public var selectedTab: DocumentTab? {
         guard let id = selectedTabID else { return nil }
@@ -28,6 +53,7 @@ public class DocumentManager: ObservableObject {
         watchers[tabID] = FileWatcher(url: url) { [weak self] in
             self?.reloadFile(id: tabID)
         }
+        saveSession()
     }
 
     public func closeTab(id: UUID) {
@@ -43,6 +69,7 @@ public class DocumentManager: ObservableObject {
                 selectedTabID = nil
             }
         }
+        saveSession()
     }
 
     public func reloadFile(id: UUID) {

@@ -3,6 +3,7 @@ import WebKit
 
 struct MarkdownWebView: NSViewRepresentable {
     let content: String
+    let isDarkMode: Bool
 
     func makeNSView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
@@ -13,6 +14,7 @@ struct MarkdownWebView: NSViewRepresentable {
         webView.navigationDelegate = context.coordinator
         context.coordinator.webView = webView
         context.coordinator.pendingContent = content
+        context.coordinator.pendingDarkMode = isDarkMode
 
         if let templateURL = Bundle.module.url(
             forResource: "template",
@@ -28,6 +30,7 @@ struct MarkdownWebView: NSViewRepresentable {
 
     func updateNSView(_ webView: WKWebView, context: Context) {
         context.coordinator.renderContent(content)
+        context.coordinator.applyDarkMode(isDarkMode)
     }
 
     func makeCoordinator() -> Coordinator {
@@ -37,15 +40,31 @@ struct MarkdownWebView: NSViewRepresentable {
     class Coordinator: NSObject, WKNavigationDelegate {
         weak var webView: WKWebView?
         var pendingContent: String?
+        var pendingDarkMode: Bool?
         var isLoaded = false
         private var lastRenderedContent: String?
+        private var lastDarkMode: Bool?
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
+            if let darkMode = pendingDarkMode {
+                pendingDarkMode = nil
+                applyDarkMode(darkMode)
+            }
             if let content = pendingContent {
                 pendingContent = nil
                 renderContent(content)
             }
+        }
+
+        func applyDarkMode(_ isDark: Bool) {
+            guard isLoaded, let webView = webView else {
+                pendingDarkMode = isDark
+                return
+            }
+            if isDark == lastDarkMode { return }
+            lastDarkMode = isDark
+            webView.evaluateJavaScript("setDarkMode(\(isDark))") { _, _ in }
         }
 
         func renderContent(_ content: String) {

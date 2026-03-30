@@ -15,11 +15,6 @@ struct TabBarView: View {
             }
             .padding(.leading, 1)
         }
-        .frame(height: 36)
-        .background(Color(nsColor: .windowBackgroundColor).opacity(0.95))
-        .overlay(
-            Divider(), alignment: .bottom
-        )
     }
 }
 
