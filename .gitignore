@@ -1,7 +1,27 @@
+# Build
 .build/
-.swiftpm/
+*.app
+
+# Xcode
 *.xcodeproj/
+*.xcworkspace/
 xcuserdata/
 DerivedData/
+
+# SwiftPM
+.swiftpm/
+Package.resolved
+
+# macOS
 .DS_Store
-*.app
+**/.DS_Store
+
+# Editor
+*.swp
+*~
+.vscode/
+.idea/
+
+# Env / secrets
+.env
+.env.*
