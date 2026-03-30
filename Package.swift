@@ -1,9 +1,12 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.0
 import PackageDescription
 
 let package = Package(
     name: "MDViewer",
     platforms: [.macOS(.v14)],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-testing.git", from: "0.12.0")
+    ],
     targets: [
         .target(
             name: "MDViewerCore",
@@ -15,7 +18,10 @@ let package = Package(
         ),
         .testTarget(
             name: "MDViewerCoreTests",
-            dependencies: ["MDViewerCore"]
+            dependencies: [
+                "MDViewerCore",
+                .product(name: "Testing", package: "swift-testing")
+            ]
         )
     ]
 )
