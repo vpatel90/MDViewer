@@ -15,21 +15,27 @@ public class DocumentManager: ObservableObject {
         restoreSession()
     }
 
+    private var isRestoring = false
+
     private func restoreSession() {
         guard let paths = UserDefaults.standard.stringArray(forKey: Self.sessionURLsKey) else { return }
         let selectedPath = UserDefaults.standard.string(forKey: Self.sessionSelectedKey)
+        isRestoring = true
         for path in paths {
             let url = URL(fileURLWithPath: path)
             guard FileManager.default.fileExists(atPath: path) else { continue }
             openFile(url: url)
         }
+        isRestoring = false
         if let selectedPath = selectedPath,
            let tab = tabs.first(where: { $0.fileURL.path == selectedPath }) {
             selectedTabID = tab.id
         }
+        saveSession()
     }
 
     private func saveSession() {
+        guard !isRestoring else { return }
         let paths = tabs.map { $0.fileURL.path }
         UserDefaults.standard.set(paths, forKey: Self.sessionURLsKey)
         UserDefaults.standard.set(selectedTab?.fileURL.path, forKey: Self.sessionSelectedKey)
