@@ -1,0 +1,938 @@
+{
+  "builtTestProducts" : [
+    {
+      "binaryPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.xctest/Contents/MacOS/MDViewerPackageTests",
+      "packagePath" : "/Users/vivek/MDViewer",
+      "productName" : "MDViewerPackageTests"
+    }
+  ],
+  "copyCommands" : {
+    "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer_MDViewerCore.bundle/Resources" : {
+      "inputs" : [
+        {
+          "kind" : "directory",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/Resources"
+        }
+      ],
+      "outputs" : [
+        {
+          "kind" : "directory",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer_MDViewerCore.bundle/Resources"
+        }
+      ]
+    }
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.MDViewer-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "fileList" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer.build/sources",
+      "importPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewer/MDViewerApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules/MDViewerCore.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer.build/sources"
+        }
+      ],
+      "isLibrary" : false,
+      "moduleName" : "MDViewer",
+      "moduleOutputPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules/MDViewer.swiftmodule",
+      "objects" : [
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer.build/MDViewerApp.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j14",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-Xfrontend",
+        "-entry-point-function-name",
+        "-Xfrontend",
+        "MDViewer_main",
+        "-parse-as-library",
+        "-swift-version",
+        "5",
+        "-I",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-L",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-plugin-path",
+        "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "mdviewer"
+      ],
+      "outputFileMapPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer.build/MDViewerApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules/MDViewer.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/vivek/MDViewer/Sources/MDViewer/MDViewerApp.swift"
+      ],
+      "tempsPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.MDViewerCore-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "fileList" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/sources",
+      "importPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/DocumentManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/DocumentTab.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/EmptyStateView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/FileWatcher.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/MarkdownWebView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/TabBarView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/DerivedSources/resource_bundle_accessor.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+        },
+        {
+          "kind" : "virtual",
+          "name" : "<MDViewerCore-arm64-apple-macosx26.0-debug.module-resources>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "MDViewerCore",
+      "moduleOutputPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules/MDViewerCore.swiftmodule",
+      "objects" : [
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/ContentView.swift.o",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/DocumentManager.swift.o",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/DocumentTab.swift.o",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/EmptyStateView.swift.o",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/FileWatcher.swift.o",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/MarkdownWebView.swift.o",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/TabBarView.swift.o",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/resource_bundle_accessor.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j14",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE",
+        "-module-cache-path",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/include/MDViewerCore-Swift.h",
+        "-swift-version",
+        "5",
+        "-I",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-L",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-plugin-path",
+        "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "mdviewer"
+      ],
+      "outputFileMapPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/DocumentManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/DocumentTab.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/EmptyStateView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/FileWatcher.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/MarkdownWebView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/TabBarView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/resource_bundle_accessor.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules/MDViewerCore.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/vivek/MDViewer/Sources/MDViewerCore/ContentView.swift",
+        "/Users/vivek/MDViewer/Sources/MDViewerCore/DocumentManager.swift",
+        "/Users/vivek/MDViewer/Sources/MDViewerCore/DocumentTab.swift",
+        "/Users/vivek/MDViewer/Sources/MDViewerCore/EmptyStateView.swift",
+        "/Users/vivek/MDViewer/Sources/MDViewerCore/FileWatcher.swift",
+        "/Users/vivek/MDViewer/Sources/MDViewerCore/MarkdownWebView.swift",
+        "/Users/vivek/MDViewer/Sources/MDViewerCore/TabBarView.swift",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/DerivedSources/resource_bundle_accessor.swift"
+      ],
+      "tempsPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.MDViewerCoreTests-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "fileList" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCoreTests.build/sources",
+      "importPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Tests/MDViewerCoreTests/DocumentManagerTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules/MDViewerCore.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCoreTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "MDViewerCoreTests",
+      "moduleOutputPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules/MDViewerCoreTests.swiftmodule",
+      "objects" : [
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCoreTests.build/DocumentManagerTests.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j14",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-swift-version",
+        "5",
+        "-I",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-L",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-plugin-path",
+        "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "mdviewer"
+      ],
+      "outputFileMapPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCoreTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCoreTests.build/DocumentManagerTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules/MDViewerCoreTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/vivek/MDViewer/Tests/MDViewerCoreTests/DocumentManagerTests.swift"
+      ],
+      "tempsPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCoreTests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.MDViewerPackageTests-arm64-apple-macosx26.0-debug.module" : {
+      "executable" : "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "fileList" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.build/sources",
+      "importPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.derived/runner.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules/MDViewerCoreTests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "MDViewerPackageTests",
+      "moduleOutputPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules/MDViewerPackageTests.swiftmodule",
+      "objects" : [
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.build/runner.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j14",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.build/include/MDViewerPackageTests-Swift.h",
+        "-I",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-L",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-plugin-path",
+        "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "mdviewer"
+      ],
+      "outputFileMapPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules/MDViewerPackageTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.derived/runner.swift"
+      ],
+      "tempsPath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "MDViewer" : [
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "-module-name",
+      "MDViewer",
+      "-package-name",
+      "mdviewer",
+      "-c",
+      "/Users/vivek/MDViewer/Sources/MDViewer/MDViewerApp.swift",
+      "-I",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j14",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-Xfrontend",
+      "-entry-point-function-name",
+      "-Xfrontend",
+      "MDViewer_main",
+      "-parse-as-library",
+      "-swift-version",
+      "5",
+      "-I",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-L",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-plugin-path",
+      "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "mdviewer",
+      "-driver-use-frontend-path",
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+    ],
+    "MDViewerCore" : [
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "-module-name",
+      "MDViewerCore",
+      "-package-name",
+      "mdviewer",
+      "-c",
+      "/Users/vivek/MDViewer/Sources/MDViewerCore/ContentView.swift",
+      "/Users/vivek/MDViewer/Sources/MDViewerCore/DocumentManager.swift",
+      "/Users/vivek/MDViewer/Sources/MDViewerCore/DocumentTab.swift",
+      "/Users/vivek/MDViewer/Sources/MDViewerCore/EmptyStateView.swift",
+      "/Users/vivek/MDViewer/Sources/MDViewerCore/FileWatcher.swift",
+      "/Users/vivek/MDViewer/Sources/MDViewerCore/MarkdownWebView.swift",
+      "/Users/vivek/MDViewer/Sources/MDViewerCore/TabBarView.swift",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/DerivedSources/resource_bundle_accessor.swift",
+      "-I",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j14",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE",
+      "-module-cache-path",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/include/MDViewerCore-Swift.h",
+      "-swift-version",
+      "5",
+      "-I",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-L",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-plugin-path",
+      "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "mdviewer",
+      "-driver-use-frontend-path",
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+    ],
+    "MDViewerCoreTests" : [
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "-module-name",
+      "MDViewerCoreTests",
+      "-package-name",
+      "mdviewer",
+      "-c",
+      "/Users/vivek/MDViewer/Tests/MDViewerCoreTests/DocumentManagerTests.swift",
+      "-I",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j14",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-swift-version",
+      "5",
+      "-I",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-L",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-plugin-path",
+      "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "mdviewer",
+      "-driver-use-frontend-path",
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+    ],
+    "MDViewerPackageTests" : [
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "-module-name",
+      "MDViewerPackageTests",
+      "-package-name",
+      "mdviewer",
+      "-c",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.derived/runner.swift",
+      "-I",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j14",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.build/include/MDViewerPackageTests-Swift.h",
+      "-I",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-L",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-plugin-path",
+      "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "mdviewer",
+      "-driver-use-frontend-path",
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "MDViewer" : [
+      "MDViewerCore"
+    ],
+    "MDViewerCore" : [
+
+    ],
+    "MDViewerCoreTests" : [
+      "MDViewerCore"
+    ],
+    "MDViewerPackageTests" : [
+      "MDViewerCoreTests",
+      "MDViewerCore"
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+    "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.derived/runner.swift" : {
+      "inputs" : [
+
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.derived/runner.swift"
+        }
+      ]
+    }
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer-entitlement.plist" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<entitlement-plist>"
+        },
+        {
+          "kind" : "virtual",
+          "name" : "<com.apple.security.get-task-allow>"
+        }
+      ],
+      "outputFilePath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer-entitlement.plist"
+    },
+    "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewer/MDViewerApp.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer.build/sources"
+    },
+    "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer.build/MDViewerApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/DocumentManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/DocumentTab.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/EmptyStateView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/FileWatcher.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/MarkdownWebView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/TabBarView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/resource_bundle_accessor.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewer.product/Objects.LinkFileList"
+    },
+    "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/DocumentManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/DocumentTab.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/EmptyStateView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/FileWatcher.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/MarkdownWebView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Sources/MDViewerCore/TabBarView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/DerivedSources/resource_bundle_accessor.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/sources"
+    },
+    "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCoreTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/Tests/MDViewerCoreTests/DocumentManagerTests.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCoreTests.build/sources"
+    },
+    "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.derived/runner.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.build/sources"
+    },
+    "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/DocumentManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/DocumentTab.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/EmptyStateView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/FileWatcher.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/MarkdownWebView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/TabBarView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCore.build/resource_bundle_accessor.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerCoreTests.build/DocumentManagerTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.build/runner.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/MDViewerPackageTests.product/Objects.LinkFileList"
+    },
+    "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/vivek/MDViewer/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+    }
+  }
+}
