@@ -420,6 +420,70 @@
         return '</div>';
     };
 
+    // KaTeX math rendering (lazy-loaded)
+    let katexLoaded = false;
+    let katexLoading = false;
+
+    async function loadKaTeXIfNeeded() {
+        if (katexLoaded) return true;
+        if (katexLoading) {
+            return new Promise(resolve => {
+                const check = setInterval(() => {
+                    if (katexLoaded) { clearInterval(check); resolve(true); }
+                }, 50);
+            });
+        }
+        katexLoading = true;
+        return new Promise((resolve, reject) => {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'katex/katex.min.css';
+            document.head.appendChild(link);
+
+            const script = document.createElement('script');
+            script.src = 'katex/katex.min.js';
+            script.onload = () => {
+                katexLoaded = true;
+                katexLoading = false;
+                resolve(true);
+            };
+            script.onerror = (e) => {
+                katexLoading = false;
+                reject(e);
+            };
+            document.head.appendChild(script);
+        });
+    }
+
+    async function renderMath() {
+        const content = document.getElementById('content');
+        const text = content.innerHTML;
+        if (!text.match(/\$\$[\s\S]+?\$\$|\$[^\$\n]+?\$/)) return;
+
+        await loadKaTeXIfNeeded();
+
+        // Process display math ($$...$$)
+        content.querySelectorAll('p, li, td, th, dd').forEach(el => {
+            if (el.querySelector('.katex')) return;
+            el.innerHTML = el.innerHTML.replace(/\$\$([\s\S]+?)\$\$/g, (match, math) => {
+                try {
+                    return katex.renderToString(math.trim(), { displayMode: true, throwOnError: false });
+                } catch(e) { return match; }
+            });
+        });
+
+        // Process inline math ($...$)
+        content.querySelectorAll('p, li, td, th, dd').forEach(el => {
+            if (el.querySelector('code, pre')) return;
+            el.innerHTML = el.innerHTML.replace(/(?<!\$)\$([^\$\n]+?)\$(?!\$)/g, (match, math) => {
+                if (/^\d/.test(math.trim())) return match;
+                try {
+                    return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false });
+                } catch(e) { return match; }
+            });
+        });
+    }
+
     // Mermaid theme configs
     const mermaidFont = '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif';
 
@@ -581,6 +645,7 @@
         }
 
         await renderMermaidDiagrams();
+        await renderMath();
     }
 
     async function renderMermaidDiagrams() {
@@ -633,6 +698,7 @@
                 }
 
                 await renderMermaidDiagrams();
+                await renderMath();
             }
         }
     }
