@@ -252,6 +252,16 @@
     .code-block:hover .copy-btn { opacity: 1; }
     .copy-btn:hover { background: var(--border); }
     .copy-btn.copied { color: #22c55e; }
+
+    mark {
+        background-color: #fff3b0;
+        padding: 0.1em 0.2em;
+        border-radius: 2px;
+    }
+    body.dark mark {
+        background-color: #854d0e;
+        color: #fef3c7;
+    }
 </style>
 <link rel="stylesheet" href="hljs-github.css" class="hljs-light">
 <link rel="stylesheet" href="hljs-github-dark.css" class="hljs-dark">
@@ -261,6 +271,7 @@
 
 <script src="highlight.min.js"></script>
 <script src="markdown-it.min.js"></script>
+<script src="markdown-it-plugins.min.js"></script>
 <script src="morphdom-umd.min.js"></script>
 <script>
     // Initialize markdown-it with syntax highlighting
@@ -280,6 +291,12 @@
             return '';
         }
     });
+
+    md.use(window.markdownitFootnote);
+    md.use(window.markdownitEmoji);
+    md.use(window.markdownitMark);
+    md.use(window.markdownitSub);
+    md.use(window.markdownitSup);
 
     // Custom fence renderer: mermaid → div, everything else → code block with copy button
     const defaultFence = md.renderer.rules.fence;
