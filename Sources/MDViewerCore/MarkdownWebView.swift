@@ -37,7 +37,9 @@ struct MarkdownWebView: NSViewRepresentable {
         }
 
         NotificationCenter.default.addObserver(forName: .init("MDViewerFind"), object: nil, queue: .main) { [weak coordinator = context.coordinator] _ in
-            coordinator?.webView?.evaluateJavaScript("showFindOverlay()") { _, _ in }
+            MainActor.assumeIsolated {
+                coordinator?.webView?.evaluateJavaScript("showFindOverlay()") { _, _ in }
+            }
         }
 
         NotificationCenter.default.addObserver(forName: .init("MDViewerScrollToHeading"), object: nil, queue: .main) { [weak coordinator = context.coordinator] notification in
@@ -50,11 +52,15 @@ struct MarkdownWebView: NSViewRepresentable {
 
         NotificationCenter.default.addObserver(forName: .init("MDViewerExportPDF"), object: nil, queue: .main) { [weak coordinator = context.coordinator] notification in
             let name = notification.object as? String ?? "document"
-            coordinator?.exportPDF(suggestedName: name)
+            MainActor.assumeIsolated {
+                coordinator?.exportPDF(suggestedName: name)
+            }
         }
 
         NotificationCenter.default.addObserver(forName: .init("MDViewerCopyHTML"), object: nil, queue: .main) { [weak coordinator = context.coordinator] _ in
-            coordinator?.copyAsHTML()
+            MainActor.assumeIsolated {
+                coordinator?.copyAsHTML()
+            }
         }
 
         return webView
