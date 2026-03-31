@@ -225,6 +225,7 @@
 <div id="content"></div>
 
 <script src="markdown-it.min.js"></script>
+<script src="morphdom-umd.min.js"></script>
 <script src="mermaid.min.js"></script>
 <script>
     // Initialize markdown-it
@@ -338,6 +339,7 @@
     let currentDarkMode = false;
     let currentMarkdownText = '';
     let currentFileDir = '';
+    let isFirstRender = true;
 
     function initMermaid(isDark) {
         mermaid.initialize(isDark ? darkMermaidConfig : lightMermaidConfig);
@@ -350,7 +352,18 @@
         currentMarkdownText = text;
         currentFileDir = fileDir || '';
         const html = md.render(text);
-        document.getElementById('content').innerHTML = html;
+        const contentEl = document.getElementById('content');
+
+        if (isFirstRender || !contentEl.hasChildNodes()) {
+            // First render: direct innerHTML for speed
+            contentEl.innerHTML = html;
+            isFirstRender = false;
+        } else {
+            // Subsequent renders: morphdom for minimal DOM changes
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = html;
+            morphdom(contentEl, wrapper, { childrenOnly: true });
+        }
 
         // Resolve relative image paths against the markdown file's directory
         if (currentFileDir) {
