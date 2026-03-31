@@ -8,12 +8,14 @@ struct MarkdownWebView: NSViewRepresentable {
     let fileDir: String
     var onHeadingsUpdate: (([HeadingItem]) -> Void)?
     var onActiveHeadingChange: ((String?) -> Void)?
+    var onStatsUpdate: ((DocumentStats) -> Void)?
 
     func makeNSView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
         config.preferences.setValue(true, forKey: "developerExtrasEnabled")
         config.userContentController.add(context.coordinator, name: "tocUpdate")
         config.userContentController.add(context.coordinator, name: "activeHeading")
+        config.userContentController.add(context.coordinator, name: "docStats")
 
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.setValue(false, forKey: "drawsBackground")
@@ -50,6 +52,7 @@ struct MarkdownWebView: NSViewRepresentable {
         let coordinator = Coordinator()
         coordinator.onHeadingsUpdate = onHeadingsUpdate
         coordinator.onActiveHeadingChange = onActiveHeadingChange
+        coordinator.onStatsUpdate = onStatsUpdate
         return coordinator
     }
 
@@ -60,6 +63,7 @@ struct MarkdownWebView: NSViewRepresentable {
         var isLoaded = false
         var onHeadingsUpdate: (([HeadingItem]) -> Void)?
         var onActiveHeadingChange: ((String?) -> Void)?
+        var onStatsUpdate: ((DocumentStats) -> Void)?
         private var lastRenderedContent: String?
         private var lastDarkMode: Bool?
         private var currentTabID: UUID?
@@ -148,6 +152,13 @@ struct MarkdownWebView: NSViewRepresentable {
                 let id = message.body as? String
                 DispatchQueue.main.async { [weak self] in
                     self?.onActiveHeadingChange?(id?.isEmpty == true ? nil : id)
+                }
+            } else if message.name == "docStats", let stats = message.body as? [String: Any] {
+                let words = stats["words"] as? Int ?? 0
+                let chars = stats["chars"] as? Int ?? 0
+                let readingTime = stats["readingTime"] as? Int ?? 0
+                DispatchQueue.main.async { [weak self] in
+                    self?.onStatsUpdate?(DocumentStats(words: words, chars: chars, readingTime: readingTime))
                 }
             }
         }

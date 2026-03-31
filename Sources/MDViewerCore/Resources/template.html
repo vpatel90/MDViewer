@@ -700,6 +700,17 @@
         await renderMath();
         extractHeadings();
         setupHeadingObserver();
+        computeStats();
+    }
+
+    function computeStats() {
+        const text = document.getElementById('content').textContent || '';
+        const words = text.split(/\s+/).filter(w => w.length > 0).length;
+        const chars = text.length;
+        const readingTime = Math.max(1, Math.ceil(words / 238));
+        try {
+            window.webkit.messageHandlers.docStats.postMessage({ words: words, chars: chars, readingTime: readingTime });
+        } catch(e) {}
     }
 
     async function renderMermaidDiagrams() {

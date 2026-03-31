@@ -64,9 +64,24 @@ public struct ContentView: View {
                             },
                             onActiveHeadingChange: { headingID in
                                 manager.activeHeadingID = headingID
+                            },
+                            onStatsUpdate: { stats in
+                                manager.documentStats = stats
                             }
                         )
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                        if let stats = manager.documentStats {
+                            HStack {
+                                Text(stats.description)
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                                Spacer()
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 4)
+                            .background(Color(nsColor: .windowBackgroundColor).opacity(0.5))
+                        }
                     } else {
                         Spacer()
                     }

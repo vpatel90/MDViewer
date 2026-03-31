@@ -8,10 +8,24 @@ public struct HeadingItem: Identifiable, Equatable {
     public let level: Int
 }
 
+public struct DocumentStats: Equatable {
+    public let words: Int
+    public let chars: Int
+    public let readingTime: Int
+
+    public var description: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        let wordStr = formatter.string(from: NSNumber(value: words)) ?? "\(words)"
+        return "\(wordStr) words \u{00B7} \(readingTime) min read"
+    }
+}
+
 @MainActor
 public class DocumentManager: ObservableObject {
     @Published public var headings: [HeadingItem] = []
     @Published public var activeHeadingID: String?
+    @Published public var documentStats: DocumentStats?
 
     @Published public var tabs: [DocumentTab] = []
     @Published public var selectedTabID: UUID?
