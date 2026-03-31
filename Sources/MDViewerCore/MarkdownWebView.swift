@@ -4,6 +4,7 @@ import WebKit
 struct MarkdownWebView: NSViewRepresentable {
     let content: String
     let isDarkMode: Bool
+    let theme: String
     let tabID: UUID
     let fileDir: String
     var onHeadingsUpdate: (([HeadingItem]) -> Void)?
@@ -49,6 +50,7 @@ struct MarkdownWebView: NSViewRepresentable {
 
     func updateNSView(_ webView: WKWebView, context: Context) {
         context.coordinator.renderContent(content, tabID: tabID, fileDir: fileDir)
+        context.coordinator.applyTheme(theme)
         context.coordinator.applyDarkMode(isDarkMode)
     }
 
@@ -64,17 +66,23 @@ struct MarkdownWebView: NSViewRepresentable {
         weak var webView: WKWebView?
         var pendingContent: (String, UUID, String)?
         var pendingDarkMode: Bool?
+        var pendingTheme: String?
         var isLoaded = false
         var onHeadingsUpdate: (([HeadingItem]) -> Void)?
         var onActiveHeadingChange: ((String?) -> Void)?
         var onStatsUpdate: ((DocumentStats) -> Void)?
         private var lastRenderedContent: String?
         private var lastDarkMode: Bool?
+        private var lastTheme: String?
         private var currentTabID: UUID?
         private var scrollPositions: [UUID: Double] = [:]
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
+            if let theme = pendingTheme {
+                pendingTheme = nil
+                applyTheme(theme)
+            }
             if let darkMode = pendingDarkMode {
                 pendingDarkMode = nil
                 applyDarkMode(darkMode)
@@ -83,6 +91,17 @@ struct MarkdownWebView: NSViewRepresentable {
                 pendingContent = nil
                 renderContent(content, tabID: tabID, fileDir: fileDir)
             }
+        }
+
+        func applyTheme(_ theme: String) {
+            guard isLoaded, let webView = webView else {
+                pendingTheme = theme
+                return
+            }
+            if theme == lastTheme { return }
+            lastTheme = theme
+            let escaped = theme.replacingOccurrences(of: "'", with: "\\'")
+            webView.evaluateJavaScript("setTheme('\(escaped)')") { _, _ in }
         }
 
         func applyDarkMode(_ isDark: Bool) {

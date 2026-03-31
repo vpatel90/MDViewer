@@ -5,6 +5,7 @@ public struct ContentView: View {
     @EnvironmentObject var manager: DocumentManager
     @AppStorage("isDarkMode") private var isDarkMode = false
     @AppStorage("sidebarVisible") private var sidebarVisible = true
+    @AppStorage("appTheme") private var appTheme = "default"
     @State private var showCommandPalette = false
 
     public init() {}
@@ -58,6 +59,7 @@ public struct ContentView: View {
                         MarkdownWebView(
                             content: tab.content,
                             isDarkMode: isDarkMode,
+                            theme: appTheme,
                             tabID: tab.id,
                             fileDir: tab.fileURL.deletingLastPathComponent().absoluteString,
                             onHeadingsUpdate: { headings in
@@ -141,6 +143,17 @@ public struct ContentView: View {
                     action: { manager.selectedTabID = tab.id }
                 ))
             }
+        }
+
+        // Themes
+        for themeName in ["default", "serif", "ink", "paper"] {
+            let displayName = themeName.capitalized
+            items.append(CommandPaletteItem(
+                icon: "paintpalette",
+                title: "Theme: \(displayName)",
+                shortcut: nil,
+                action: { appTheme = themeName }
+            ))
         }
 
         // Actions
