@@ -4,6 +4,7 @@ import WebKit
 struct MarkdownWebView: NSViewRepresentable {
     let content: String
     let isDarkMode: Bool
+    let tabID: UUID
 
     func makeNSView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
@@ -13,7 +14,7 @@ struct MarkdownWebView: NSViewRepresentable {
         webView.setValue(false, forKey: "drawsBackground")
         webView.navigationDelegate = context.coordinator
         context.coordinator.webView = webView
-        context.coordinator.pendingContent = content
+        context.coordinator.pendingContent = (content, tabID)
         context.coordinator.pendingDarkMode = isDarkMode
 
         if let templateURL = Bundle.module.url(
@@ -29,7 +30,7 @@ struct MarkdownWebView: NSViewRepresentable {
     }
 
     func updateNSView(_ webView: WKWebView, context: Context) {
-        context.coordinator.renderContent(content)
+        context.coordinator.renderContent(content, tabID: tabID)
         context.coordinator.applyDarkMode(isDarkMode)
     }
 
@@ -39,11 +40,13 @@ struct MarkdownWebView: NSViewRepresentable {
 
     class Coordinator: NSObject, WKNavigationDelegate {
         weak var webView: WKWebView?
-        var pendingContent: String?
+        var pendingContent: (String, UUID)?
         var pendingDarkMode: Bool?
         var isLoaded = false
         private var lastRenderedContent: String?
         private var lastDarkMode: Bool?
+        private var currentTabID: UUID?
+        private var scrollPositions: [UUID: Double] = [:]
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isLoaded = true
@@ -51,9 +54,9 @@ struct MarkdownWebView: NSViewRepresentable {
                 pendingDarkMode = nil
                 applyDarkMode(darkMode)
             }
-            if let content = pendingContent {
+            if let (content, tabID) = pendingContent {
                 pendingContent = nil
-                renderContent(content)
+                renderContent(content, tabID: tabID)
             }
         }
 
@@ -67,23 +70,46 @@ struct MarkdownWebView: NSViewRepresentable {
             webView.evaluateJavaScript("setDarkMode(\(isDark))") { _, _ in }
         }
 
-        func renderContent(_ content: String) {
+        func renderContent(_ content: String, tabID: UUID) {
             guard isLoaded, let webView = webView else {
-                pendingContent = content
+                pendingContent = (content, tabID)
                 return
             }
 
-            if content == lastRenderedContent { return }
+            let isTabSwitch = tabID != currentTabID
+
+            // Skip if same tab + same content (file watcher re-deliver)
+            if !isTabSwitch && content == lastRenderedContent { return }
+
+            // Save scroll position for outgoing tab
+            if isTabSwitch, let outgoingID = currentTabID {
+                webView.evaluateJavaScript("window.pageYOffset") { [weak self] result, _ in
+                    if let pos = result as? Double {
+                        self?.scrollPositions[outgoingID] = pos
+                    }
+                }
+            }
+
+            currentTabID = tabID
             lastRenderedContent = content
 
             guard let jsonData = try? JSONEncoder().encode(content),
                   let jsonString = String(data: jsonData, encoding: .utf8) else { return }
 
-            webView.evaluateJavaScript("renderMarkdown(\(jsonString))") { _, error in
+            let savedScroll = scrollPositions[tabID] ?? 0
+
+            webView.evaluateJavaScript("renderMarkdown(\(jsonString))") { [weak self] _, error in
                 if let error = error {
                     print("MDViewer render error: \(error.localizedDescription)")
                 }
+                if isTabSwitch && savedScroll > 0 {
+                    self?.webView?.evaluateJavaScript("window.scrollTo(0, \(savedScroll))") { _, _ in }
+                }
             }
+        }
+
+        func clearScrollPosition(for tabID: UUID) {
+            scrollPositions.removeValue(forKey: tabID)
         }
     }
 }

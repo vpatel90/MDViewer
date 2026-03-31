@@ -33,8 +33,7 @@ public struct ContentView: View {
                 .overlay(Divider(), alignment: .bottom)
 
                 if let tab = manager.selectedTab {
-                    MarkdownWebView(content: tab.content, isDarkMode: isDarkMode)
-                        .id(tab.id)
+                    MarkdownWebView(content: tab.content, isDarkMode: isDarkMode, tabID: tab.id)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     Spacer()
