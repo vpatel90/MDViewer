@@ -32,5 +32,6 @@ struct EmptyStateView: View {
                 .foregroundStyle(.quaternary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .transition(.scale(scale: 0.95).combined(with: .opacity))
     }
 }

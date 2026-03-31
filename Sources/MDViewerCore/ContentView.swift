@@ -90,6 +90,7 @@ public struct ContentView: View {
                     }
                 }
             }
+            .animation(.spring(.smooth), value: manager.tabs.isEmpty)
         }
         .frame(minWidth: 600, minHeight: 400)
         .background(isDarkMode ? Color(nsColor: .windowBackgroundColor) : Color(nsColor: .textBackgroundColor))
