@@ -5,6 +5,7 @@ struct MarkdownWebView: NSViewRepresentable {
     let content: String
     let isDarkMode: Bool
     let tabID: UUID
+    let fileDir: String
 
     func makeNSView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
@@ -14,7 +15,7 @@ struct MarkdownWebView: NSViewRepresentable {
         webView.setValue(false, forKey: "drawsBackground")
         webView.navigationDelegate = context.coordinator
         context.coordinator.webView = webView
-        context.coordinator.pendingContent = (content, tabID)
+        context.coordinator.pendingContent = (content, tabID, fileDir)
         context.coordinator.pendingDarkMode = isDarkMode
 
         if let templateURL = Bundle.module.url(
@@ -22,15 +23,14 @@ struct MarkdownWebView: NSViewRepresentable {
             withExtension: "html",
             subdirectory: "Resources"
         ) {
-            let resourceDir = templateURL.deletingLastPathComponent()
-            webView.loadFileURL(templateURL, allowingReadAccessTo: resourceDir)
+            webView.loadFileURL(templateURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
         }
 
         return webView
     }
 
     func updateNSView(_ webView: WKWebView, context: Context) {
-        context.coordinator.renderContent(content, tabID: tabID)
+        context.coordinator.renderContent(content, tabID: tabID, fileDir: fileDir)
         context.coordinator.applyDarkMode(isDarkMode)
     }
 
@@ -40,7 +40,7 @@ struct MarkdownWebView: NSViewRepresentable {
 
     class Coordinator: NSObject, WKNavigationDelegate {
         weak var webView: WKWebView?
-        var pendingContent: (String, UUID)?
+        var pendingContent: (String, UUID, String)?
         var pendingDarkMode: Bool?
         var isLoaded = false
         private var lastRenderedContent: String?
@@ -54,9 +54,9 @@ struct MarkdownWebView: NSViewRepresentable {
                 pendingDarkMode = nil
                 applyDarkMode(darkMode)
             }
-            if let (content, tabID) = pendingContent {
+            if let (content, tabID, fileDir) = pendingContent {
                 pendingContent = nil
-                renderContent(content, tabID: tabID)
+                renderContent(content, tabID: tabID, fileDir: fileDir)
             }
         }
 
@@ -70,9 +70,9 @@ struct MarkdownWebView: NSViewRepresentable {
             webView.evaluateJavaScript("setDarkMode(\(isDark))") { _, _ in }
         }
 
-        func renderContent(_ content: String, tabID: UUID) {
+        func renderContent(_ content: String, tabID: UUID, fileDir: String = "") {
             guard isLoaded, let webView = webView else {
-                pendingContent = (content, tabID)
+                pendingContent = (content, tabID, fileDir)
                 return
             }
 
@@ -98,7 +98,11 @@ struct MarkdownWebView: NSViewRepresentable {
 
             let savedScroll = scrollPositions[tabID] ?? 0
 
-            webView.evaluateJavaScript("renderMarkdown(\(jsonString))") { [weak self] _, error in
+            let escapedDir = fileDir
+                .replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "'", with: "\\'")
+
+            webView.evaluateJavaScript("renderMarkdown(\(jsonString), '\(escapedDir)')") { [weak self] _, error in
                 if let error = error {
                     print("MDViewer render error: \(error.localizedDescription)")
                 }

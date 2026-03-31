@@ -337,6 +337,7 @@
 
     let currentDarkMode = false;
     let currentMarkdownText = '';
+    let currentFileDir = '';
 
     function initMermaid(isDark) {
         mermaid.initialize(isDark ? darkMermaidConfig : lightMermaidConfig);
@@ -345,10 +346,23 @@
     initMermaid(false);
 
     // Main render function — called from Swift via evaluateJavaScript
-    async function renderMarkdown(text) {
+    async function renderMarkdown(text, fileDir) {
         currentMarkdownText = text;
+        currentFileDir = fileDir || '';
         const html = md.render(text);
         document.getElementById('content').innerHTML = html;
+
+        // Resolve relative image paths against the markdown file's directory
+        if (currentFileDir) {
+            document.querySelectorAll('#content img').forEach(img => {
+                const src = img.getAttribute('src');
+                if (src && !src.startsWith('http') && !src.startsWith('file:')
+                    && !src.startsWith('data:') && !src.startsWith('/')) {
+                    img.src = currentFileDir + '/' + src;
+                }
+            });
+        }
+
         await renderMermaidDiagrams();
     }
 
@@ -389,6 +403,18 @@
                 // Re-parse and re-render to get fresh mermaid divs
                 const html = md.render(currentMarkdownText);
                 document.getElementById('content').innerHTML = html;
+
+                // Resolve relative image paths against the markdown file's directory
+                if (currentFileDir) {
+                    document.querySelectorAll('#content img').forEach(img => {
+                        const src = img.getAttribute('src');
+                        if (src && !src.startsWith('http') && !src.startsWith('file:')
+                            && !src.startsWith('data:') && !src.startsWith('/')) {
+                            img.src = currentFileDir + '/' + src;
+                        }
+                    });
+                }
+
                 await renderMermaidDiagrams();
             }
         }
