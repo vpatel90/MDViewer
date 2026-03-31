@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TabBarView: View {
     @EnvironmentObject var manager: DocumentManager
+    @Namespace private var tabNamespace
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -9,7 +10,8 @@ struct TabBarView: View {
                 ForEach(manager.tabs) { tab in
                     TabItemView(
                         tab: tab,
-                        isSelected: tab.id == manager.selectedTabID
+                        isSelected: tab.id == manager.selectedTabID,
+                        namespace: tabNamespace
                     )
                 }
             }
@@ -21,6 +23,7 @@ struct TabBarView: View {
 struct TabItemView: View {
     let tab: DocumentTab
     let isSelected: Bool
+    var namespace: Namespace.ID
     @EnvironmentObject var manager: DocumentManager
     @State private var isHovering = false
 
@@ -44,17 +47,25 @@ struct TabItemView: View {
             }
             .buttonStyle(.plain)
             .opacity(isHovering || isSelected ? 1 : 0)
+            .animation(.easeInOut(duration: 0.15), value: isHovering)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
         .background(
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
-                .fill(isSelected
-                    ? Color(nsColor: .controlBackgroundColor)
-                    : (isHovering ? Color(nsColor: .controlBackgroundColor).opacity(0.5) : Color.clear))
-                .padding(.vertical, 3)
-                .padding(.horizontal, 2)
+            Group {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(Color(nsColor: .controlBackgroundColor))
+                        .matchedGeometryEffect(id: "activeTab", in: namespace)
+                } else if isHovering {
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(Color(nsColor: .controlBackgroundColor).opacity(0.5))
+                }
+            }
+            .padding(.vertical, 3)
+            .padding(.horizontal, 2)
         )
+        .animation(.spring(.snappy), value: isSelected)
         .onTapGesture {
             manager.selectedTabID = tab.id
         }

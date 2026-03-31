@@ -52,7 +52,7 @@ public struct ContentView: View {
                         .padding(.trailing, 12)
                     }
                     .frame(height: 36)
-                    .background(Color(nsColor: .windowBackgroundColor).opacity(0.95))
+                    .background(.ultraThinMaterial)
                     .overlay(Divider(), alignment: .bottom)
 
                     if let tab = manager.selectedTab {
