@@ -37,6 +37,13 @@ struct MDViewerApp: App {
             // Remove "New Window" from Window menu
             CommandGroup(replacing: .singleWindowList) {}
 
+            CommandGroup(after: .textEditing) {
+                Button("Find...") {
+                    NotificationCenter.default.post(name: .init("MDViewerFind"), object: nil)
+                }
+                .keyboardShortcut("f")
+            }
+
             CommandGroup(after: .toolbar) {
                 Button("Next Tab") {
                     manager.selectNextTab()

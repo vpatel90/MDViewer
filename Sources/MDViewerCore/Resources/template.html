@@ -302,6 +302,48 @@
 
     .markdown-alert-title svg { flex-shrink: 0; }
     .markdown-alert p:last-child { margin-bottom: 0; }
+
+    #find-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 16px;
+        z-index: 9999;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        padding: 8px 12px;
+        gap: 6px;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        font-size: 13px;
+    }
+    #find-input {
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 13px;
+        background: var(--bg);
+        color: var(--text);
+        outline: none;
+        width: 200px;
+    }
+    #find-input:focus { border-color: var(--link); }
+    #find-count { font-size: 11px; color: var(--blockquote-text); min-width: 60px; }
+    #find-overlay button {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 2px 6px;
+        cursor: pointer;
+        color: var(--text);
+        font-size: 12px;
+    }
+    #find-overlay button:hover { background: var(--code-bg); }
+    .find-highlight { background: #fff3b0; color: #000; border-radius: 2px; }
+    body.dark .find-highlight { background: #854d0e; color: #fef3c7; }
+    .find-active { background: #f97316 !important; color: #fff !important; }
 </style>
 <link rel="stylesheet" href="hljs-github.css" class="hljs-light">
 <link rel="stylesheet" href="hljs-github-dark.css" class="hljs-dark">
@@ -778,6 +820,117 @@
                 btn.classList.remove('copied');
             }, 2000);
         });
+    }
+
+    // Find in page
+    function showFindOverlay() {
+        let overlay = document.getElementById('find-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'find-overlay';
+            overlay.innerHTML = '<input type="text" id="find-input" placeholder="Find..." autofocus>' +
+                '<span id="find-count"></span>' +
+                '<button onclick="findNext()">&#9660;</button>' +
+                '<button onclick="findPrev()">&#9650;</button>' +
+                '<button onclick="closeFindOverlay()">&#10005;</button>';
+            document.body.prepend(overlay);
+            document.getElementById('find-input').addEventListener('input', performFind);
+            document.getElementById('find-input').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.shiftKey ? findPrev() : findNext(); }
+                if (e.key === 'Escape') closeFindOverlay();
+            });
+        }
+        overlay.style.display = 'flex';
+        document.getElementById('find-input').focus();
+        document.getElementById('find-input').select();
+    }
+
+    function closeFindOverlay() {
+        const overlay = document.getElementById('find-overlay');
+        if (overlay) overlay.style.display = 'none';
+        clearHighlights();
+    }
+
+    let findMatches = [];
+    let findIndex = -1;
+
+    function performFind() {
+        clearHighlights();
+        const query = document.getElementById('find-input').value;
+        if (!query) { document.getElementById('find-count').textContent = ''; return; }
+
+        const content = document.getElementById('content');
+        const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, null);
+        const textNodes = [];
+        while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+        findMatches = [];
+        const lowerQuery = query.toLowerCase();
+        textNodes.forEach(function(node) {
+            const text = node.textContent.toLowerCase();
+            let idx = text.indexOf(lowerQuery);
+            while (idx !== -1) {
+                findMatches.push({ node: node, index: idx, length: query.length });
+                idx = text.indexOf(lowerQuery, idx + 1);
+            }
+        });
+
+        // Highlight matches (process in reverse to preserve indices)
+        for (let i = findMatches.length - 1; i >= 0; i--) {
+            var m = findMatches[i];
+            var range = document.createRange();
+            range.setStart(m.node, m.index);
+            range.setEnd(m.node, m.index + m.length);
+            var span = document.createElement('mark');
+            span.className = 'find-highlight';
+            range.surroundContents(span);
+        }
+
+        findIndex = findMatches.length > 0 ? 0 : -1;
+        updateFindCount();
+        if (findIndex >= 0) scrollToMatch(findIndex);
+    }
+
+    function clearHighlights() {
+        document.querySelectorAll('.find-highlight').forEach(function(el) {
+            var parent = el.parentNode;
+            parent.replaceChild(document.createTextNode(el.textContent), el);
+            parent.normalize();
+        });
+        findMatches = [];
+        findIndex = -1;
+    }
+
+    function findNext() {
+        if (findMatches.length === 0) return;
+        findIndex = (findIndex + 1) % findMatches.length;
+        updateFindCount();
+        scrollToMatch(findIndex);
+    }
+
+    function findPrev() {
+        if (findMatches.length === 0) return;
+        findIndex = (findIndex - 1 + findMatches.length) % findMatches.length;
+        updateFindCount();
+        scrollToMatch(findIndex);
+    }
+
+    function scrollToMatch(idx) {
+        var highlights = document.querySelectorAll('.find-highlight');
+        highlights.forEach(function(h) { h.classList.remove('find-active'); });
+        if (highlights[idx]) {
+            highlights[idx].classList.add('find-active');
+            highlights[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function updateFindCount() {
+        var countEl = document.getElementById('find-count');
+        if (findMatches.length === 0) {
+            countEl.textContent = document.getElementById('find-input').value ? 'No results' : '';
+        } else {
+            countEl.textContent = (findIndex + 1) + ' of ' + findMatches.length;
+        }
     }
 
     window.templateReady = true;

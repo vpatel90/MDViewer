@@ -32,6 +32,10 @@ struct MarkdownWebView: NSViewRepresentable {
             webView.loadFileURL(templateURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
         }
 
+        NotificationCenter.default.addObserver(forName: .init("MDViewerFind"), object: nil, queue: .main) { [weak coordinator = context.coordinator] _ in
+            coordinator?.webView?.evaluateJavaScript("showFindOverlay()") { _, _ in }
+        }
+
         NotificationCenter.default.addObserver(forName: .init("MDViewerScrollToHeading"), object: nil, queue: .main) { [weak coordinator = context.coordinator] notification in
             if let headingID = notification.object as? String {
                 MainActor.assumeIsolated {
