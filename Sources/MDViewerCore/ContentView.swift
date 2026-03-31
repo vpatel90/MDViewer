@@ -5,6 +5,7 @@ public struct ContentView: View {
     @EnvironmentObject var manager: DocumentManager
     @AppStorage("isDarkMode") private var isDarkMode = false
     @AppStorage("sidebarVisible") private var sidebarVisible = true
+    @State private var showCommandPalette = false
 
     public init() {}
 
@@ -92,6 +93,64 @@ public struct ContentView: View {
         .background(isDarkMode ? Color(nsColor: .windowBackgroundColor) : Color(nsColor: .textBackgroundColor))
         .onDrop(of: [.fileURL], isTargeted: nil, perform: handleDrop)
         .navigationTitle(manager.selectedTab?.filename ?? "MDViewer")
+        .overlay {
+            if showCommandPalette {
+                ZStack {
+                    Color.black.opacity(0.3)
+                        .ignoresSafeArea()
+                        .onTapGesture { showCommandPalette = false }
+
+                    VStack {
+                        CommandPaletteView(
+                            isPresented: $showCommandPalette,
+                            items: buildCommandPaletteItems()
+                        )
+                        .padding(.top, 80)
+                        Spacer()
+                    }
+                }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .init("MDViewerCommandPalette"))) { _ in
+            showCommandPalette.toggle()
+        }
+    }
+
+    private func buildCommandPaletteItems() -> [CommandPaletteItem] {
+        var items: [CommandPaletteItem] = []
+
+        // Headings
+        for heading in manager.headings {
+            items.append(CommandPaletteItem(
+                icon: "text.alignleft",
+                title: heading.text,
+                shortcut: nil,
+                action: {
+                    NotificationCenter.default.post(name: .init("MDViewerScrollToHeading"), object: heading.id)
+                }
+            ))
+        }
+
+        // Tab switching
+        for tab in manager.tabs {
+            if tab.id != manager.selectedTabID {
+                items.append(CommandPaletteItem(
+                    icon: "square.on.square",
+                    title: "Switch to \(tab.filename)",
+                    shortcut: nil,
+                    action: { manager.selectedTabID = tab.id }
+                ))
+            }
+        }
+
+        // Actions
+        items.append(CommandPaletteItem(icon: "doc", title: "Open File...", shortcut: "\u{2318}O",
+            action: { manager.openFileDialog() }))
+        items.append(CommandPaletteItem(icon: isDarkMode ? "sun.max.fill" : "moon.fill",
+            title: isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode", shortcut: nil,
+            action: { isDarkMode.toggle() }))
+
+        return items
     }
 
     private func handleDrop(providers: [NSItemProvider]) -> Bool {

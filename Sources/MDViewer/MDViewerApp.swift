@@ -42,6 +42,11 @@ struct MDViewerApp: App {
                     NotificationCenter.default.post(name: .init("MDViewerFind"), object: nil)
                 }
                 .keyboardShortcut("f")
+
+                Button("Command Palette") {
+                    NotificationCenter.default.post(name: .init("MDViewerCommandPalette"), object: nil)
+                }
+                .keyboardShortcut("k")
             }
 
             CommandGroup(after: .toolbar) {
