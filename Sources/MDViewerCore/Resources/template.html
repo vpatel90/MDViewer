@@ -226,7 +226,6 @@
 
 <script src="markdown-it.min.js"></script>
 <script src="morphdom-umd.min.js"></script>
-<script src="mermaid.min.js"></script>
 <script>
     // Initialize markdown-it
     const md = window.markdownit({
@@ -341,11 +340,43 @@
     let currentFileDir = '';
     let isFirstRender = true;
 
+    let mermaidLoaded = false;
+    let mermaidLoading = false;
+
     function initMermaid(isDark) {
-        mermaid.initialize(isDark ? darkMermaidConfig : lightMermaidConfig);
+        if (mermaidLoaded && typeof mermaid !== 'undefined') {
+            mermaid.initialize(isDark ? darkMermaidConfig : lightMermaidConfig);
+        }
     }
 
-    initMermaid(false);
+    async function loadMermaidIfNeeded() {
+        if (mermaidLoaded) return true;
+        if (mermaidLoading) {
+            return new Promise(resolve => {
+                const check = setInterval(() => {
+                    if (mermaidLoaded) { clearInterval(check); resolve(true); }
+                }, 50);
+            });
+        }
+
+        mermaidLoading = true;
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'mermaid.min.js';
+            script.onload = () => {
+                mermaidLoaded = true;
+                mermaidLoading = false;
+                mermaid.initialize(currentDarkMode ? darkMermaidConfig : lightMermaidConfig);
+                resolve(true);
+            };
+            script.onerror = (e) => {
+                mermaidLoading = false;
+                console.error('Failed to load mermaid:', e);
+                reject(e);
+            };
+            document.head.appendChild(script);
+        });
+    }
 
     // Main render function — called from Swift via evaluateJavaScript
     async function renderMarkdown(text, fileDir) {
@@ -381,24 +412,24 @@
 
     async function renderMermaidDiagrams() {
         const mermaidDivs = document.querySelectorAll('.mermaid');
-        if (mermaidDivs.length > 0) {
-            // Reset any previously rendered diagrams
-            mermaidDivs.forEach(div => {
-                if (div.getAttribute('data-processed')) {
-                    const code = div.getAttribute('data-original') || div.textContent;
-                    div.removeAttribute('data-processed');
-                    div.innerHTML = code;
-                }
-                // Store original source for re-renders
-                if (!div.getAttribute('data-original')) {
-                    div.setAttribute('data-original', div.textContent);
-                }
-            });
-            try {
-                await mermaid.run({ querySelector: '.mermaid' });
-            } catch(e) {
-                console.error('Mermaid rendering error:', e);
+        if (mermaidDivs.length === 0) return;
+
+        await loadMermaidIfNeeded();
+
+        mermaidDivs.forEach(div => {
+            if (div.getAttribute('data-processed')) {
+                const code = div.getAttribute('data-original') || div.textContent;
+                div.removeAttribute('data-processed');
+                div.innerHTML = code;
             }
+            if (!div.getAttribute('data-original')) {
+                div.setAttribute('data-original', div.textContent);
+            }
+        });
+        try {
+            await mermaid.run({ querySelector: '.mermaid' });
+        } catch(e) {
+            console.error('Mermaid rendering error:', e);
         }
     }
 
