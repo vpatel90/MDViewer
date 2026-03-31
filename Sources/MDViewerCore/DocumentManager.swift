@@ -2,8 +2,17 @@ import SwiftUI
 import AppKit
 import UniformTypeIdentifiers
 
+public struct HeadingItem: Identifiable, Equatable {
+    public let id: String
+    public let text: String
+    public let level: Int
+}
+
 @MainActor
 public class DocumentManager: ObservableObject {
+    @Published public var headings: [HeadingItem] = []
+    @Published public var activeHeadingID: String?
+
     @Published public var tabs: [DocumentTab] = []
     @Published public var selectedTabID: UUID?
     private var watchers: [UUID: FileWatcher] = [:]

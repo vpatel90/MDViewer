@@ -6,10 +6,14 @@ struct MarkdownWebView: NSViewRepresentable {
     let isDarkMode: Bool
     let tabID: UUID
     let fileDir: String
+    var onHeadingsUpdate: (([HeadingItem]) -> Void)?
+    var onActiveHeadingChange: ((String?) -> Void)?
 
     func makeNSView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
         config.preferences.setValue(true, forKey: "developerExtrasEnabled")
+        config.userContentController.add(context.coordinator, name: "tocUpdate")
+        config.userContentController.add(context.coordinator, name: "activeHeading")
 
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.setValue(false, forKey: "drawsBackground")
@@ -26,6 +30,14 @@ struct MarkdownWebView: NSViewRepresentable {
             webView.loadFileURL(templateURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
         }
 
+        NotificationCenter.default.addObserver(forName: .init("MDViewerScrollToHeading"), object: nil, queue: .main) { [weak coordinator = context.coordinator] notification in
+            if let headingID = notification.object as? String {
+                MainActor.assumeIsolated {
+                    coordinator?.scrollToHeading(headingID)
+                }
+            }
+        }
+
         return webView
     }
 
@@ -35,14 +47,19 @@ struct MarkdownWebView: NSViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator()
+        let coordinator = Coordinator()
+        coordinator.onHeadingsUpdate = onHeadingsUpdate
+        coordinator.onActiveHeadingChange = onActiveHeadingChange
+        return coordinator
     }
 
-    class Coordinator: NSObject, WKNavigationDelegate {
+    class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         weak var webView: WKWebView?
         var pendingContent: (String, UUID, String)?
         var pendingDarkMode: Bool?
         var isLoaded = false
+        var onHeadingsUpdate: (([HeadingItem]) -> Void)?
+        var onActiveHeadingChange: ((String?) -> Void)?
         private var lastRenderedContent: String?
         private var lastDarkMode: Bool?
         private var currentTabID: UUID?
@@ -114,6 +131,31 @@ struct MarkdownWebView: NSViewRepresentable {
 
         func clearScrollPosition(for tabID: UUID) {
             scrollPositions.removeValue(forKey: tabID)
+        }
+
+        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+            if message.name == "tocUpdate", let headings = message.body as? [[String: Any]] {
+                let items = headings.compactMap { dict -> HeadingItem? in
+                    guard let id = dict["id"] as? String,
+                          let text = dict["text"] as? String,
+                          let level = dict["level"] as? Int else { return nil }
+                    return HeadingItem(id: id, text: text, level: level)
+                }
+                DispatchQueue.main.async { [weak self] in
+                    self?.onHeadingsUpdate?(items)
+                }
+            } else if message.name == "activeHeading" {
+                let id = message.body as? String
+                DispatchQueue.main.async { [weak self] in
+                    self?.onActiveHeadingChange?(id?.isEmpty == true ? nil : id)
+                }
+            }
+        }
+
+        func scrollToHeading(_ headingID: String) {
+            guard isLoaded, let webView = webView else { return }
+            let escaped = headingID.replacingOccurrences(of: "'", with: "\\'")
+            webView.evaluateJavaScript("document.getElementById('\(escaped)')?.scrollIntoView({ behavior: 'smooth', block: 'start' })") { _, _ in }
         }
     }
 }

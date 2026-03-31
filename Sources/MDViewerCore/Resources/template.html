@@ -484,6 +484,58 @@
         });
     }
 
+    // TOC: Extract headings and send to Swift
+    function extractHeadings() {
+        const headings = [];
+        document.querySelectorAll('#content h1, #content h2, #content h3, #content h4, #content h5, #content h6').forEach((el, i) => {
+            if (!el.id) {
+                el.id = 'heading-' + i;
+            }
+            headings.push({
+                id: el.id,
+                text: el.textContent,
+                level: parseInt(el.tagName[1])
+            });
+        });
+        try {
+            window.webkit.messageHandlers.tocUpdate.postMessage(headings);
+        } catch(e) {}
+    }
+
+    // Active heading tracking via IntersectionObserver
+    let headingObserver = null;
+
+    function setupHeadingObserver() {
+        if (headingObserver) headingObserver.disconnect();
+
+        const headingEls = document.querySelectorAll('#content h1, #content h2, #content h3, #content h4, #content h5, #content h6');
+        if (headingEls.length === 0) return;
+
+        headingObserver = new IntersectionObserver((entries) => {
+            let topHeading = null;
+            let topY = Infinity;
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const rect = entry.boundingClientRect;
+                    if (rect.top < topY && rect.top >= -50) {
+                        topY = rect.top;
+                        topHeading = entry.target;
+                    }
+                }
+            });
+            if (topHeading) {
+                try {
+                    window.webkit.messageHandlers.activeHeading.postMessage(topHeading.id);
+                } catch(e) {}
+            }
+        }, {
+            rootMargin: '0px 0px -80% 0px',
+            threshold: [0, 1]
+        });
+
+        headingEls.forEach(el => headingObserver.observe(el));
+    }
+
     // Mermaid theme configs
     const mermaidFont = '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif';
 
@@ -646,6 +698,8 @@
 
         await renderMermaidDiagrams();
         await renderMath();
+        extractHeadings();
+        setupHeadingObserver();
     }
 
     async function renderMermaidDiagrams() {

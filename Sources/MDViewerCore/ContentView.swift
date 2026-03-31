@@ -4,39 +4,72 @@ import UniformTypeIdentifiers
 public struct ContentView: View {
     @EnvironmentObject var manager: DocumentManager
     @AppStorage("isDarkMode") private var isDarkMode = false
+    @AppStorage("sidebarVisible") private var sidebarVisible = true
 
     public init() {}
 
     public var body: some View {
-        VStack(spacing: 0) {
-            if manager.tabs.isEmpty {
-                EmptyStateView()
-                    .environmentObject(manager)
-            } else {
-                HStack(spacing: 0) {
-                    TabBarView()
-                        .environmentObject(manager)
-
+        NavigationSplitView {
+            if manager.headings.isEmpty {
+                VStack {
                     Spacer()
-
-                    Toggle(isOn: $isDarkMode) {
-                        Image(systemName: isDarkMode ? "moon.fill" : "sun.max.fill")
-                            .font(.system(size: 11))
-                            .foregroundStyle(.secondary)
-                    }
-                    .toggleStyle(.switch)
-                    .controlSize(.mini)
-                    .padding(.trailing, 12)
+                    Text("No Headings")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Spacer()
                 }
-                .frame(height: 36)
-                .background(Color(nsColor: .windowBackgroundColor).opacity(0.95))
-                .overlay(Divider(), alignment: .bottom)
-
-                if let tab = manager.selectedTab {
-                    MarkdownWebView(content: tab.content, isDarkMode: isDarkMode, tabID: tab.id, fileDir: tab.fileURL.deletingLastPathComponent().absoluteString)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity)
+            } else {
+                TOCSidebarView(
+                    headings: manager.headings,
+                    activeHeadingID: manager.activeHeadingID,
+                    onHeadingTap: { headingID in
+                        NotificationCenter.default.post(name: .init("MDViewerScrollToHeading"), object: headingID)
+                    }
+                )
+            }
+        } detail: {
+            VStack(spacing: 0) {
+                if manager.tabs.isEmpty {
+                    EmptyStateView()
+                        .environmentObject(manager)
                 } else {
-                    Spacer()
+                    HStack(spacing: 0) {
+                        TabBarView()
+                            .environmentObject(manager)
+
+                        Spacer()
+
+                        Toggle(isOn: $isDarkMode) {
+                            Image(systemName: isDarkMode ? "moon.fill" : "sun.max.fill")
+                                .font(.system(size: 11))
+                                .foregroundStyle(.secondary)
+                        }
+                        .toggleStyle(.switch)
+                        .controlSize(.mini)
+                        .padding(.trailing, 12)
+                    }
+                    .frame(height: 36)
+                    .background(Color(nsColor: .windowBackgroundColor).opacity(0.95))
+                    .overlay(Divider(), alignment: .bottom)
+
+                    if let tab = manager.selectedTab {
+                        MarkdownWebView(
+                            content: tab.content,
+                            isDarkMode: isDarkMode,
+                            tabID: tab.id,
+                            fileDir: tab.fileURL.deletingLastPathComponent().absoluteString,
+                            onHeadingsUpdate: { headings in
+                                manager.headings = headings
+                            },
+                            onActiveHeadingChange: { headingID in
+                                manager.activeHeadingID = headingID
+                            }
+                        )
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        Spacer()
+                    }
                 }
             }
         }
