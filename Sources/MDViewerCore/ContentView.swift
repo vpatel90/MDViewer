@@ -62,6 +62,7 @@ public struct ContentView: View {
                             theme: appTheme,
                             tabID: tab.id,
                             fileDir: tab.fileURL.deletingLastPathComponent().absoluteString,
+                            filename: tab.filename,
                             onHeadingsUpdate: { headings in
                                 manager.headings = headings
                             },
@@ -163,6 +164,10 @@ public struct ContentView: View {
         items.append(CommandPaletteItem(icon: isDarkMode ? "sun.max.fill" : "moon.fill",
             title: isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode", shortcut: nil,
             action: { isDarkMode.toggle() }))
+        items.append(CommandPaletteItem(icon: "arrow.down.doc", title: "Export as PDF...", shortcut: "\u{21E7}\u{2318}E",
+            action: { NotificationCenter.default.post(name: .init("MDViewerExportPDF"), object: manager.selectedTab?.filename) }))
+        items.append(CommandPaletteItem(icon: "doc.richtext", title: "Copy as HTML", shortcut: nil,
+            action: { NotificationCenter.default.post(name: .init("MDViewerCopyHTML"), object: nil) }))
 
         return items
     }

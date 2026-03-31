@@ -49,6 +49,19 @@ struct MDViewerApp: App {
                 .keyboardShortcut("k")
             }
 
+            CommandGroup(after: .importExport) {
+                Button("Export as PDF...") {
+                    NotificationCenter.default.post(name: .init("MDViewerExportPDF"), object: manager.selectedTab?.filename)
+                }
+                .keyboardShortcut("e", modifiers: [.command, .shift])
+                .disabled(manager.tabs.isEmpty)
+
+                Button("Copy as HTML") {
+                    NotificationCenter.default.post(name: .init("MDViewerCopyHTML"), object: nil)
+                }
+                .disabled(manager.tabs.isEmpty)
+            }
+
             CommandGroup(after: .toolbar) {
                 Button("Next Tab") {
                     manager.selectNextTab()

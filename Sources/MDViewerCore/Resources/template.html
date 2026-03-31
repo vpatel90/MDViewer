@@ -425,6 +425,25 @@
     .find-highlight { background: #fff3b0; color: #000; border-radius: 2px; }
     body.dark .find-highlight { background: #854d0e; color: #fef3c7; }
     .find-active { background: #f97316 !important; color: #fff !important; }
+
+    @media print {
+        body {
+            max-width: none;
+            padding: 0;
+            color: #000 !important;
+            background: #fff !important;
+        }
+        pre, blockquote, table, .mermaid {
+            page-break-inside: avoid;
+        }
+        a[href]::after {
+            content: " (" attr(href) ")";
+            font-size: 0.8em;
+            color: #666;
+        }
+        .copy-btn, #find-overlay { display: none !important; }
+        h1, h2, h3, h4 { page-break-after: avoid; }
+    }
 </style>
 <link rel="stylesheet" href="hljs-github.css" class="hljs-light">
 <link rel="stylesheet" href="hljs-github-dark.css" class="hljs-dark">

@@ -1,5 +1,7 @@
 import SwiftUI
 import WebKit
+import AppKit
+import UniformTypeIdentifiers
 
 struct MarkdownWebView: NSViewRepresentable {
     let content: String
@@ -7,6 +9,7 @@ struct MarkdownWebView: NSViewRepresentable {
     let theme: String
     let tabID: UUID
     let fileDir: String
+    let filename: String
     var onHeadingsUpdate: (([HeadingItem]) -> Void)?
     var onActiveHeadingChange: ((String?) -> Void)?
     var onStatsUpdate: ((DocumentStats) -> Void)?
@@ -43,6 +46,15 @@ struct MarkdownWebView: NSViewRepresentable {
                     coordinator?.scrollToHeading(headingID)
                 }
             }
+        }
+
+        NotificationCenter.default.addObserver(forName: .init("MDViewerExportPDF"), object: nil, queue: .main) { [weak coordinator = context.coordinator] notification in
+            let name = notification.object as? String ?? "document"
+            coordinator?.exportPDF(suggestedName: name)
+        }
+
+        NotificationCenter.default.addObserver(forName: .init("MDViewerCopyHTML"), object: nil, queue: .main) { [weak coordinator = context.coordinator] _ in
+            coordinator?.copyAsHTML()
         }
 
         return webView
@@ -190,6 +202,42 @@ struct MarkdownWebView: NSViewRepresentable {
             guard isLoaded, let webView = webView else { return }
             let escaped = headingID.replacingOccurrences(of: "'", with: "\\'")
             webView.evaluateJavaScript("document.getElementById('\(escaped)')?.scrollIntoView({ behavior: 'smooth', block: 'start' })") { _, _ in }
+        }
+
+        func exportPDF(suggestedName: String) {
+            guard let webView = webView else { return }
+            let config = WKPDFConfiguration()
+            config.rect = CGRect(x: 0, y: 0, width: 595.28, height: 841.89) // A4
+
+            webView.createPDF(configuration: config) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let data):
+                        let panel = NSSavePanel()
+                        panel.allowedContentTypes = [UTType.pdf]
+                        panel.nameFieldStringValue = suggestedName.replacingOccurrences(of: ".md", with: ".pdf")
+                            .replacingOccurrences(of: ".markdown", with: ".pdf")
+                        panel.canCreateDirectories = true
+                        if panel.runModal() == .OK, let url = panel.url {
+                            try? data.write(to: url)
+                        }
+                    case .failure(let error):
+                        print("PDF export error: \(error)")
+                    }
+                }
+            }
+        }
+
+        func copyAsHTML() {
+            guard let webView = webView else { return }
+            webView.evaluateJavaScript("document.getElementById('content').innerHTML") { result, _ in
+                guard let html = result as? String else { return }
+                let fullHTML = "<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head><body>\(html)</body></html>"
+                let pasteboard = NSPasteboard.general
+                pasteboard.clearContents()
+                pasteboard.setString(fullHTML, forType: .html)
+                pasteboard.setString(html, forType: .string)
+            }
         }
     }
 }
