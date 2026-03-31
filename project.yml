@@ -1,0 +1,58 @@
+name: MDViewer
+options:
+  bundleIdPrefix: com.mdviewer
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "16.0"
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+targets:
+  MDViewer:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/MDViewer
+      - path: Sources/MDViewerCore
+    resources:
+      - path: Sources/MDViewerCore/Resources
+        buildPhase: resources
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.mdviewer.app
+      PRODUCT_NAME: MDViewer
+      GENERATE_INFOPLIST_FILE: true
+      INFOPLIST_KEY_CFBundleDisplayName: MDViewer
+      INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.developer-tools"
+      INFOPLIST_KEY_NSHighResolutionCapable: true
+      INFOPLIST_KEY_NSSupportsAutomaticTermination: true
+      INFOPLIST_KEY_NSSupportsSuddenTermination: true
+      INFOPLIST_FILE: ""
+    dependencies:
+      - target: MDViewerQuickLook
+        embed: true
+  MDViewerQuickLook:
+    type: appex
+    platform: macOS
+    sources:
+      - path: MDViewerQuickLook
+    resources:
+      - path: Sources/MDViewerCore/Resources/markdown-it.min.js
+        buildPhase: resources
+      - path: Sources/MDViewerCore/Resources/highlight.min.js
+        buildPhase: resources
+      - path: Sources/MDViewerCore/Resources/hljs-github.css
+        buildPhase: resources
+      - path: Sources/MDViewerCore/Resources/hljs-github-dark.css
+        buildPhase: resources
+      - path: Sources/MDViewerCore/Resources/InterVariable.woff2
+        buildPhase: resources
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.mdviewer.app.quicklook
+      PRODUCT_NAME: MDViewerQuickLook
+      GENERATE_INFOPLIST_FILE: false
+      INFOPLIST_FILE: MDViewerQuickLook/Info.plist
+      SKIP_INSTALL: true
+    entitlements:
+      path: MDViewerQuickLook/MDViewerQuickLook.entitlements
