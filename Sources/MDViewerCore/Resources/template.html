@@ -219,32 +219,91 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+    /* Highlight.js theme toggle */
+    .hljs-light { display: block; }
+    .hljs-dark { display: none; }
+    body.dark .hljs-light { display: none; }
+    body.dark .hljs-dark { display: block; }
+
+    /* Code block wrapper */
+    .code-block {
+        position: relative;
+        margin-bottom: 1em;
+    }
+    .code-block pre {
+        margin-bottom: 0;
+    }
+    .copy-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        padding: 3px 8px;
+        font-size: 0.7em;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--blockquote-text);
+        background: var(--code-bg);
+        border: 1px solid var(--code-border);
+        border-radius: 4px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+    .code-block:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { background: var(--border); }
+    .copy-btn.copied { color: #22c55e; }
 </style>
+<link rel="stylesheet" href="hljs-github.css" class="hljs-light">
+<link rel="stylesheet" href="hljs-github-dark.css" class="hljs-dark">
 </head>
 <body>
 <div id="content"></div>
 
+<script src="highlight.min.js"></script>
 <script src="markdown-it.min.js"></script>
 <script src="morphdom-umd.min.js"></script>
 <script>
-    // Initialize markdown-it
+    // Initialize markdown-it with syntax highlighting
     const md = window.markdownit({
         html: true,
         linkify: true,
-        typographer: true
+        typographer: true,
+        highlight: function(str, lang) {
+            if (lang && hljs.getLanguage(lang)) {
+                try {
+                    return hljs.highlight(str, { language: lang, ignoreIllegals: true }).value;
+                } catch (_) {}
+            }
+            try {
+                return hljs.highlightAuto(str).value;
+            } catch (_) {}
+            return '';
+        }
     });
 
-    // Custom fence renderer: mermaid code blocks → <div class="mermaid">
+    // Custom fence renderer: mermaid → div, everything else → code block with copy button
     const defaultFence = md.renderer.rules.fence;
     md.renderer.rules.fence = function(tokens, idx, options, env, self) {
         const token = tokens[idx];
-        if (token.info.trim().toLowerCase() === 'mermaid') {
+        const lang = token.info.trim().split(/\s+/)[0].toLowerCase();
+
+        if (lang === 'mermaid') {
             return '<div class="mermaid">' + md.utils.escapeHtml(token.content) + '</div>';
         }
-        if (defaultFence) {
-            return defaultFence.call(this, tokens, idx, options, env, self);
+
+        // Render with highlight.js
+        let highlighted;
+        if (options.highlight) {
+            highlighted = options.highlight(token.content, lang) || md.utils.escapeHtml(token.content);
+        } else {
+            highlighted = md.utils.escapeHtml(token.content);
         }
-        return self.renderToken(tokens, idx, options);
+
+        const langAttr = lang ? ' data-lang="' + md.utils.escapeHtml(lang) + '"' : '';
+        return '<div class="code-block"' + langAttr + '>' +
+               '<button class="copy-btn" onclick="copyCode(this)">Copy</button>' +
+               '<pre><code class="hljs">' + highlighted + '</code></pre>' +
+               '</div>';
     };
 
     // Mermaid theme configs
@@ -462,6 +521,18 @@
                 await renderMermaidDiagrams();
             }
         }
+    }
+
+    function copyCode(btn) {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.textContent).then(() => {
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = 'Copy';
+                btn.classList.remove('copied');
+            }, 2000);
+        });
     }
 
     window.templateReady = true;
