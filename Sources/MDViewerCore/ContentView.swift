@@ -11,88 +11,86 @@ public struct ContentView: View {
     public init() {}
 
     public var body: some View {
-        NavigationSplitView {
-            if manager.headings.isEmpty {
-                VStack {
-                    Spacer()
-                    Text("No Headings")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
+        VStack(spacing: 0) {
+            if manager.tabs.isEmpty {
+                EmptyStateView()
+                    .environmentObject(manager)
             } else {
-                TOCSidebarView(
-                    headings: manager.headings,
-                    activeHeadingID: manager.activeHeadingID,
-                    onHeadingTap: { headingID in
-                        NotificationCenter.default.post(name: .init("MDViewerScrollToHeading"), object: headingID)
-                    }
-                )
-            }
-        } detail: {
-            VStack(spacing: 0) {
-                if manager.tabs.isEmpty {
-                    EmptyStateView()
+                // Tab bar (full width, above everything)
+                HStack(spacing: 0) {
+                    TabBarView()
                         .environmentObject(manager)
+
+                    Spacer()
+
+                    // Sidebar toggle
+                    Button(action: { withAnimation(.spring(.snappy)) { sidebarVisible.toggle() } }) {
+                        Image(systemName: "sidebar.left")
+                            .font(.system(size: 11))
+                            .foregroundStyle(sidebarVisible ? .primary : .secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.trailing, 8)
+
+                    Toggle(isOn: $isDarkMode) {
+                        Image(systemName: isDarkMode ? "moon.fill" : "sun.max.fill")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
+                    }
+                    .toggleStyle(.switch)
+                    .controlSize(.mini)
+                    .padding(.trailing, 12)
+                }
+                .frame(height: 36)
+                .background(.ultraThinMaterial)
+                .overlay(Divider(), alignment: .bottom)
+
+                // Content area: sidebar + webview side by side
+                if let tab = manager.selectedTab {
+                    HSplitView {
+                        if sidebarVisible {
+                            tocSidebar
+                                .frame(minWidth: 180, idealWidth: 220, maxWidth: 300)
+                        }
+
+                        VStack(spacing: 0) {
+                            MarkdownWebView(
+                                content: tab.content,
+                                isDarkMode: isDarkMode,
+                                theme: appTheme,
+                                tabID: tab.id,
+                                fileDir: tab.fileURL.deletingLastPathComponent().absoluteString,
+                                filename: tab.filename,
+                                onHeadingsUpdate: { headings in
+                                    manager.headings = headings
+                                },
+                                onActiveHeadingChange: { headingID in
+                                    manager.activeHeadingID = headingID
+                                },
+                                onStatsUpdate: { stats in
+                                    manager.documentStats = stats
+                                }
+                            )
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                            if let stats = manager.documentStats {
+                                HStack {
+                                    Text(stats.description)
+                                        .font(.caption2)
+                                        .foregroundStyle(.tertiary)
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 4)
+                            }
+                        }
+                    }
                 } else {
-                    HStack(spacing: 0) {
-                        TabBarView()
-                            .environmentObject(manager)
-
-                        Spacer()
-
-                        Toggle(isOn: $isDarkMode) {
-                            Image(systemName: isDarkMode ? "moon.fill" : "sun.max.fill")
-                                .font(.system(size: 11))
-                                .foregroundStyle(.secondary)
-                        }
-                        .toggleStyle(.switch)
-                        .controlSize(.mini)
-                        .padding(.trailing, 12)
-                    }
-                    .frame(height: 36)
-                    .background(.ultraThinMaterial)
-                    .overlay(Divider(), alignment: .bottom)
-
-                    if let tab = manager.selectedTab {
-                        MarkdownWebView(
-                            content: tab.content,
-                            isDarkMode: isDarkMode,
-                            theme: appTheme,
-                            tabID: tab.id,
-                            fileDir: tab.fileURL.deletingLastPathComponent().absoluteString,
-                            filename: tab.filename,
-                            onHeadingsUpdate: { headings in
-                                manager.headings = headings
-                            },
-                            onActiveHeadingChange: { headingID in
-                                manager.activeHeadingID = headingID
-                            },
-                            onStatsUpdate: { stats in
-                                manager.documentStats = stats
-                            }
-                        )
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-                        if let stats = manager.documentStats {
-                            HStack {
-                                Text(stats.description)
-                                    .font(.caption2)
-                                    .foregroundStyle(.tertiary)
-                                Spacer()
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 4)
-                            .background(Color(nsColor: .windowBackgroundColor).opacity(0.5))
-                        }
-                    } else {
-                        Spacer()
-                    }
+                    Spacer()
                 }
             }
-            .animation(.spring(.smooth), value: manager.tabs.isEmpty)
         }
+        .animation(.spring(.smooth), value: manager.tabs.isEmpty)
         .frame(minWidth: 600, minHeight: 400)
         .background(isDarkMode ? Color(nsColor: .windowBackgroundColor) : Color(nsColor: .textBackgroundColor))
         .onDrop(of: [.fileURL], isTargeted: nil, perform: handleDrop)
@@ -117,6 +115,54 @@ public struct ContentView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .init("MDViewerCommandPalette"))) { _ in
             showCommandPalette.toggle()
+        }
+    }
+
+    private var tocSidebar: some View {
+        ScrollViewReader { proxy in
+            List {
+                if manager.headings.isEmpty {
+                    Text("No Headings")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                } else {
+                    ForEach(manager.headings) { heading in
+                        Button(action: {
+                            NotificationCenter.default.post(name: .init("MDViewerScrollToHeading"), object: heading.id)
+                        }) {
+                            Text(heading.text)
+                                .font(.system(size: fontSize(for: heading.level),
+                                              weight: heading.level <= 2 ? .semibold : .regular))
+                                .foregroundStyle(heading.id == manager.activeHeadingID ? .primary : .secondary)
+                                .lineLimit(2)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.leading, CGFloat(max(0, heading.level - 1)) * 12)
+                        .padding(.vertical, 2)
+                        .listRowBackground(
+                            heading.id == manager.activeHeadingID
+                                ? Color.accentColor.opacity(0.1)
+                                : Color.clear
+                        )
+                        .id(heading.id)
+                    }
+                }
+            }
+            .listStyle(.sidebar)
+            .onChange(of: manager.activeHeadingID) { _, newID in
+                if let id = newID {
+                    withAnimation { proxy.scrollTo(id, anchor: .center) }
+                }
+            }
+        }
+    }
+
+    private func fontSize(for level: Int) -> CGFloat {
+        switch level {
+        case 1: return 13
+        case 2: return 12.5
+        default: return 12
         }
     }
 
@@ -164,6 +210,9 @@ public struct ContentView: View {
         items.append(CommandPaletteItem(icon: isDarkMode ? "sun.max.fill" : "moon.fill",
             title: isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode", shortcut: nil,
             action: { isDarkMode.toggle() }))
+        items.append(CommandPaletteItem(icon: "sidebar.left",
+            title: sidebarVisible ? "Hide Sidebar" : "Show Sidebar", shortcut: nil,
+            action: { withAnimation(.spring(.snappy)) { sidebarVisible.toggle() } }))
         items.append(CommandPaletteItem(icon: "arrow.down.doc", title: "Export as PDF...", shortcut: "\u{21E7}\u{2318}E",
             action: { NotificationCenter.default.post(name: .init("MDViewerExportPDF"), object: manager.selectedTab?.filename) }))
         items.append(CommandPaletteItem(icon: "doc.richtext", title: "Copy as HTML", shortcut: nil,
