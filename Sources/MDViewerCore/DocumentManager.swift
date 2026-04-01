@@ -2,8 +2,31 @@ import SwiftUI
 import AppKit
 import UniformTypeIdentifiers
 
+public struct HeadingItem: Identifiable, Equatable {
+    public let id: String
+    public let text: String
+    public let level: Int
+}
+
+public struct DocumentStats: Equatable {
+    public let words: Int
+    public let chars: Int
+    public let readingTime: Int
+
+    public var description: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        let wordStr = formatter.string(from: NSNumber(value: words)) ?? "\(words)"
+        return "\(wordStr) words \u{00B7} \(readingTime) min read"
+    }
+}
+
 @MainActor
 public class DocumentManager: ObservableObject {
+    @Published public var headings: [HeadingItem] = []
+    @Published public var activeHeadingID: String?
+    @Published public var documentStats: DocumentStats?
+
     @Published public var tabs: [DocumentTab] = []
     @Published public var selectedTabID: UUID?
     private var watchers: [UUID: FileWatcher] = [:]
@@ -82,6 +105,11 @@ public class DocumentManager: ObservableObject {
         guard let index = tabs.firstIndex(where: { $0.id == id }) else { return }
         guard let content = try? String(contentsOf: tabs[index].fileURL, encoding: .utf8) else { return }
         tabs[index].content = content
+    }
+
+    public func selectTab(at index: Int) {
+        guard index >= 0 && index < tabs.count else { return }
+        selectedTabID = tabs[index].id
     }
 
     public func openFileDialog() {

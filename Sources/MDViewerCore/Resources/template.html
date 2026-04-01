@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
+    @font-face {
+        font-family: 'Inter';
+        src: url('InterVariable.woff2') format('woff2');
+        font-weight: 100 900;
+        font-display: swap;
+    }
+
     :root {
         --text: #24292f;
         --bg: #ffffff;
@@ -18,6 +25,11 @@
         --heading-text: #1f2328;
         --kbd-bg: #f6f8fa;
         --kbd-border: #d0d7de;
+        --body-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+        --heading-font: var(--body-font);
+        --body-line-height: 1.6;
+        --scrollbar-thumb: #c1c1c1;
+        --scrollbar-thumb-hover: #a8a8a8;
     }
 
     body.dark {
@@ -34,39 +46,105 @@
         --heading-text: #f0f6fc;
         --kbd-bg: #161b22;
         --kbd-border: #30363d;
+        --scrollbar-thumb: #484f58;
+        --scrollbar-thumb-hover: #6e7681;
     }
 
-    body.dark ::-webkit-scrollbar-thumb { background: #484f58; }
-    body.dark ::-webkit-scrollbar-thumb:hover { background: #6e7681; }
+    /* Theme: Serif */
+    body.theme-serif {
+        --bg: #faf8f5; --text: #2c2c2c; --heading-text: #1a1a1a;
+        --code-bg: #f0ece6; --code-border: #d9d1c7; --border: #d9d1c7;
+        --link: #8b4513; --blockquote-border: #d9d1c7; --blockquote-text: #6b6155;
+        --table-border: #d9d1c7; --table-alt: #f0ece6;
+        --kbd-bg: #f0ece6; --kbd-border: #d9d1c7;
+        --scrollbar-thumb: #c4b9ac; --scrollbar-thumb-hover: #a89a8c;
+        --body-font: Georgia, "Times New Roman", Charter, serif;
+        --heading-font: Georgia, "Times New Roman", Charter, serif;
+        --body-line-height: 1.7;
+    }
+    body.theme-serif.dark {
+        --bg: #1a1a1a; --text: #d4cfc8; --heading-text: #e8e2da;
+        --code-bg: #252220; --code-border: #3d3733; --border: #3d3733;
+        --link: #d4a574; --blockquote-border: #3d3733; --blockquote-text: #8c8278;
+        --table-border: #3d3733; --table-alt: #252220;
+        --kbd-bg: #252220; --kbd-border: #3d3733;
+        --scrollbar-thumb: #4a423b; --scrollbar-thumb-hover: #645a50;
+    }
+
+    /* Theme: Ink */
+    body.theme-ink {
+        --bg: #0d1117; --text: #e6edf3; --heading-text: #f0f6fc;
+        --code-bg: #161b22; --code-border: #30363d; --border: #30363d;
+        --link: #58a6ff; --blockquote-border: #30363d; --blockquote-text: #8b949e;
+        --table-border: #30363d; --table-alt: #161b22;
+        --kbd-bg: #161b22; --kbd-border: #30363d;
+        --scrollbar-thumb: #484f58; --scrollbar-thumb-hover: #6e7681;
+        --body-font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        --heading-font: var(--body-font);
+        --body-line-height: 1.6;
+    }
+    body.theme-ink.dark {
+        --bg: #000000; --text: #e0e0e0; --heading-text: #ffffff;
+        --code-bg: #0d0d0d; --code-border: #222; --border: #222;
+        --link: #6cb6ff; --blockquote-border: #222; --blockquote-text: #777;
+        --table-border: #222; --table-alt: #0d0d0d;
+        --kbd-bg: #0d0d0d; --kbd-border: #222;
+        --scrollbar-thumb: #333; --scrollbar-thumb-hover: #555;
+    }
+
+    /* Theme: Paper */
+    body.theme-paper {
+        --bg: #f5f0e8; --text: #3b3530; --heading-text: #2a2520;
+        --code-bg: #ebe5db; --code-border: #d4cdc2; --border: #d4cdc2;
+        --link: #6b5c3e; --blockquote-border: #d4cdc2; --blockquote-text: #7a7168;
+        --table-border: #d4cdc2; --table-alt: #ebe5db;
+        --kbd-bg: #ebe5db; --kbd-border: #d4cdc2;
+        --scrollbar-thumb: #c4bdb2; --scrollbar-thumb-hover: #a8a094;
+        --body-font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        --heading-font: var(--body-font);
+        --body-line-height: 1.65;
+    }
+    body.theme-paper.dark {
+        --bg: #2a2520; --text: #d4cfc8; --heading-text: #e8e2da;
+        --code-bg: #342e28; --code-border: #4a423b; --border: #4a423b;
+        --link: #c4a878; --blockquote-border: #4a423b; --blockquote-text: #8c8278;
+        --table-border: #4a423b; --table-alt: #342e28;
+        --kbd-bg: #342e28; --kbd-border: #4a423b;
+        --scrollbar-thumb: #4a423b; --scrollbar-thumb-hover: #645a50;
+    }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     html {
-        font-size: 16px;
+        font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
         -webkit-text-size-adjust: 100%;
     }
 
     body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+        font-family: var(--body-font);
         font-size: 1rem;
-        line-height: 1.7;
+        line-height: var(--body-line-height);
         color: var(--text);
         background: var(--bg);
-        max-width: 820px;
+        max-width: 68ch;
         margin: 0 auto;
         padding: 32px 40px 80px;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         word-wrap: break-word;
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     h1, h2, h3, h4, h5, h6 {
+        font-family: var(--heading-font);
         color: var(--heading-text);
         font-weight: 600;
         line-height: 1.25;
-        margin-top: 1.5em;
+        letter-spacing: -0.02em;
         margin-bottom: 0.625em;
     }
+    h1, h2 { margin-top: 2em; }
+    h3, h4, h5, h6 { margin-top: 1.5em; }
 
     h1 {
         font-size: 2em;
@@ -87,7 +165,7 @@
 
     h1:first-child, h2:first-child, h3:first-child { margin-top: 0; }
 
-    p { margin-bottom: 1em; }
+    p { margin-bottom: 1.25em; }
 
     a { color: var(--link); text-decoration: none; }
     a:hover { text-decoration: underline; }
@@ -113,6 +191,7 @@
         padding: 0.2em 0.4em;
         border-radius: 6px;
         border: 1px solid var(--code-border);
+        transition: background-color 0.3s ease;
     }
 
     pre {
@@ -123,6 +202,7 @@
         overflow-x: auto;
         margin-bottom: 1em;
         line-height: 1.5;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     pre code {
@@ -138,6 +218,7 @@
         padding: 0.25em 1em;
         margin-bottom: 1em;
         color: var(--blockquote-text);
+        transition: border-color 0.3s ease, color 0.3s ease;
     }
     blockquote p:last-child { margin-bottom: 0; }
     blockquote blockquote { margin-top: 0.5em; }
@@ -215,37 +296,387 @@
     .footnotes { font-size: 0.85em; margin-top: 2em; border-top: 1px solid var(--border); padding-top: 1em; }
     .footnotes ol { padding-left: 1.5em; }
 
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+
+    /* Highlight.js theme toggle */
+    .hljs-light { display: block; }
+    .hljs-dark { display: none; }
+    body.dark .hljs-light { display: none; }
+    body.dark .hljs-dark { display: block; }
+
+    /* Code block wrapper */
+    .code-block {
+        position: relative;
+        margin-bottom: 1em;
+    }
+    .code-block pre {
+        margin-bottom: 0;
+    }
+    .copy-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        padding: 3px 8px;
+        font-size: 0.7em;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--blockquote-text);
+        background: var(--code-bg);
+        border: 1px solid var(--code-border);
+        border-radius: 4px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+    .code-block:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { background: var(--border); }
+    .copy-btn.copied { color: #22c55e; }
+
+    mark {
+        background-color: #fff3b0;
+        padding: 0.1em 0.2em;
+        border-radius: 2px;
+    }
+    body.dark mark {
+        background-color: #854d0e;
+        color: #fef3c7;
+    }
+
+    .markdown-alert {
+        padding: 0.5em 1em;
+        margin-bottom: 1em;
+        border-radius: 0 6px 6px 0;
+    }
+    .markdown-alert-note { border-left: 4px solid #0969da; background: rgba(9,105,218,0.08); }
+    .markdown-alert-tip { border-left: 4px solid #1a7f37; background: rgba(26,127,55,0.08); }
+    .markdown-alert-important { border-left: 4px solid #8250df; background: rgba(130,80,223,0.08); }
+    .markdown-alert-warning { border-left: 4px solid #9a6700; background: rgba(154,103,0,0.08); }
+    .markdown-alert-caution { border-left: 4px solid #cf222e; background: rgba(207,34,46,0.08); }
+
+    body.dark .markdown-alert-note { border-left-color: #58a6ff; background: rgba(88,166,255,0.1); }
+    body.dark .markdown-alert-tip { border-left-color: #3fb950; background: rgba(63,185,80,0.1); }
+    body.dark .markdown-alert-important { border-left-color: #a371f7; background: rgba(163,113,247,0.1); }
+    body.dark .markdown-alert-warning { border-left-color: #d29922; background: rgba(210,153,34,0.1); }
+    body.dark .markdown-alert-caution { border-left-color: #f85149; background: rgba(248,81,73,0.1); }
+
+    .markdown-alert-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        font-weight: 600;
+        font-size: 0.875em;
+        margin-bottom: 0.25em;
+    }
+    .markdown-alert-note .markdown-alert-title { color: #0969da; }
+    .markdown-alert-tip .markdown-alert-title { color: #1a7f37; }
+    .markdown-alert-important .markdown-alert-title { color: #8250df; }
+    .markdown-alert-warning .markdown-alert-title { color: #9a6700; }
+    .markdown-alert-caution .markdown-alert-title { color: #cf222e; }
+
+    body.dark .markdown-alert-note .markdown-alert-title { color: #58a6ff; }
+    body.dark .markdown-alert-tip .markdown-alert-title { color: #3fb950; }
+    body.dark .markdown-alert-important .markdown-alert-title { color: #a371f7; }
+    body.dark .markdown-alert-warning .markdown-alert-title { color: #d29922; }
+    body.dark .markdown-alert-caution .markdown-alert-title { color: #f85149; }
+
+    .markdown-alert-title svg { flex-shrink: 0; }
+    .markdown-alert p:last-child { margin-bottom: 0; }
+
+    #find-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 16px;
+        z-index: 9999;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        padding: 8px 12px;
+        gap: 6px;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        font-size: 13px;
+    }
+    #find-input {
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 13px;
+        background: var(--bg);
+        color: var(--text);
+        outline: none;
+        width: 200px;
+    }
+    #find-input:focus { border-color: var(--link); }
+    #find-count { font-size: 11px; color: var(--blockquote-text); min-width: 60px; }
+    #find-overlay button {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 2px 6px;
+        cursor: pointer;
+        color: var(--text);
+        font-size: 12px;
+    }
+    #find-overlay button:hover { background: var(--code-bg); }
+    .find-highlight { background: #fff3b0; color: #000; border-radius: 2px; }
+    body.dark .find-highlight { background: #854d0e; color: #fef3c7; }
+    .find-active { background: #f97316 !important; color: #fff !important; }
+
+    @media print {
+        body {
+            max-width: none;
+            padding: 0;
+            color: #000 !important;
+            background: #fff !important;
+        }
+        pre, blockquote, table, .mermaid {
+            page-break-inside: avoid;
+        }
+        a[href]::after {
+            content: " (" attr(href) ")";
+            font-size: 0.8em;
+            color: #666;
+        }
+        .copy-btn, #find-overlay { display: none !important; }
+        h1, h2, h3, h4 { page-break-after: avoid; }
+    }
 </style>
+<link rel="stylesheet" href="hljs-github.css" class="hljs-light">
+<link rel="stylesheet" href="hljs-github-dark.css" class="hljs-dark">
 </head>
 <body>
 <div id="content"></div>
 
+<script src="highlight.min.js"></script>
 <script src="markdown-it.min.js"></script>
-<script src="mermaid.min.js"></script>
+<script src="markdown-it-plugins.min.js"></script>
+<script src="morphdom-umd.min.js"></script>
 <script>
-    // Initialize markdown-it
+    // Initialize markdown-it with syntax highlighting
     const md = window.markdownit({
         html: true,
         linkify: true,
-        typographer: true
+        typographer: true,
+        highlight: function(str, lang) {
+            if (lang && hljs.getLanguage(lang)) {
+                try {
+                    return hljs.highlight(str, { language: lang, ignoreIllegals: true }).value;
+                } catch (_) {}
+            }
+            try {
+                return hljs.highlightAuto(str).value;
+            } catch (_) {}
+            return '';
+        }
     });
 
-    // Custom fence renderer: mermaid code blocks → <div class="mermaid">
+    md.use(window.markdownitFootnote);
+    md.use(window.markdownitEmoji.full);
+    md.use(window.markdownitMark);
+    md.use(window.markdownitSub);
+    md.use(window.markdownitSup);
+
+    // Custom fence renderer: mermaid → div, everything else → code block with copy button
     const defaultFence = md.renderer.rules.fence;
     md.renderer.rules.fence = function(tokens, idx, options, env, self) {
         const token = tokens[idx];
-        if (token.info.trim().toLowerCase() === 'mermaid') {
+        const lang = token.info.trim().split(/\s+/)[0].toLowerCase();
+
+        if (lang === 'mermaid') {
             return '<div class="mermaid">' + md.utils.escapeHtml(token.content) + '</div>';
         }
-        if (defaultFence) {
-            return defaultFence.call(this, tokens, idx, options, env, self);
+
+        // Render with highlight.js
+        let highlighted;
+        if (options.highlight) {
+            highlighted = options.highlight(token.content, lang) || md.utils.escapeHtml(token.content);
+        } else {
+            highlighted = md.utils.escapeHtml(token.content);
         }
-        return self.renderToken(tokens, idx, options);
+
+        const langAttr = lang ? ' data-lang="' + md.utils.escapeHtml(lang) + '"' : '';
+        return '<div class="code-block"' + langAttr + '>' +
+               '<button class="copy-btn" onclick="copyCode(this)">Copy</button>' +
+               '<pre><code class="hljs">' + highlighted + '</code></pre>' +
+               '</div>';
     };
+
+    // GitHub-style alerts plugin (inline implementation)
+    const alertTypes = {
+        'NOTE':      { icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/></svg>', color: '#0969da', darkColor: '#58a6ff' },
+        'TIP':       { icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"/></svg>', color: '#1a7f37', darkColor: '#3fb950' },
+        'IMPORTANT': { icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/></svg>', color: '#8250df', darkColor: '#a371f7' },
+        'WARNING':   { icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/></svg>', color: '#9a6700', darkColor: '#d29922' },
+        'CAUTION':   { icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/></svg>', color: '#cf222e', darkColor: '#f85149' },
+    };
+
+    md.core.ruler.after('block', 'github_alerts', function(state) {
+        const tokens = state.tokens;
+        for (let i = 0; i < tokens.length; i++) {
+            if (tokens[i].type !== 'blockquote_open') continue;
+
+            let j = i + 1;
+            while (j < tokens.length && tokens[j].type !== 'blockquote_close') {
+                if (tokens[j].type === 'inline') {
+                    const match = tokens[j].content.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*\n?/);
+                    if (match) {
+                        const type = match[1];
+                        const info = alertTypes[type];
+                        tokens[j].content = tokens[j].content.slice(match[0].length);
+                        tokens[i].type = 'alert_open';
+                        tokens[i].tag = 'div';
+                        tokens[i].info = type;
+
+                        let depth = 1;
+                        for (let k = i + 1; k < tokens.length; k++) {
+                            if (tokens[k].type === 'blockquote_open') depth++;
+                            if (tokens[k].type === 'blockquote_close') {
+                                depth--;
+                                if (depth === 0) {
+                                    tokens[k].type = 'alert_close';
+                                    tokens[k].tag = 'div';
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+                j++;
+            }
+        }
+    });
+
+    md.renderer.rules.alert_open = function(tokens, idx) {
+        const type = tokens[idx].info;
+        const info = alertTypes[type];
+        return '<div class="markdown-alert markdown-alert-' + type.toLowerCase() + '">' +
+               '<p class="markdown-alert-title">' + info.icon + ' ' + type.charAt(0) + type.slice(1).toLowerCase() + '</p>';
+    };
+
+    md.renderer.rules.alert_close = function() {
+        return '</div>';
+    };
+
+    // KaTeX math rendering (lazy-loaded)
+    let katexLoaded = false;
+    let katexLoading = false;
+
+    async function loadKaTeXIfNeeded() {
+        if (katexLoaded) return true;
+        if (katexLoading) {
+            return new Promise(resolve => {
+                const check = setInterval(() => {
+                    if (katexLoaded) { clearInterval(check); resolve(true); }
+                }, 50);
+            });
+        }
+        katexLoading = true;
+        return new Promise((resolve, reject) => {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'katex/katex.min.css';
+            document.head.appendChild(link);
+
+            const script = document.createElement('script');
+            script.src = 'katex/katex.min.js';
+            script.onload = () => {
+                katexLoaded = true;
+                katexLoading = false;
+                resolve(true);
+            };
+            script.onerror = (e) => {
+                katexLoading = false;
+                reject(e);
+            };
+            document.head.appendChild(script);
+        });
+    }
+
+    async function renderMath() {
+        const content = document.getElementById('content');
+        const text = content.innerHTML;
+        if (!text.match(/\$\$[\s\S]+?\$\$|\$[^\$\n]+?\$/)) return;
+
+        await loadKaTeXIfNeeded();
+
+        // Process display math ($$...$$)
+        content.querySelectorAll('p, li, td, th, dd').forEach(el => {
+            if (el.querySelector('.katex')) return;
+            el.innerHTML = el.innerHTML.replace(/\$\$([\s\S]+?)\$\$/g, (match, math) => {
+                try {
+                    return katex.renderToString(math.trim(), { displayMode: true, throwOnError: false });
+                } catch(e) { return match; }
+            });
+        });
+
+        // Process inline math ($...$)
+        content.querySelectorAll('p, li, td, th, dd').forEach(el => {
+            if (el.querySelector('code, pre')) return;
+            el.innerHTML = el.innerHTML.replace(/(?<!\$)\$([^\$\n]+?)\$(?!\$)/g, (match, math) => {
+                if (/^\d/.test(math.trim())) return match;
+                try {
+                    return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false });
+                } catch(e) { return match; }
+            });
+        });
+    }
+
+    // TOC: Extract headings and send to Swift
+    function extractHeadings() {
+        const headings = [];
+        document.querySelectorAll('#content h1, #content h2, #content h3, #content h4, #content h5, #content h6').forEach((el, i) => {
+            if (!el.id) {
+                el.id = 'heading-' + i;
+            }
+            headings.push({
+                id: el.id,
+                text: el.textContent,
+                level: parseInt(el.tagName[1])
+            });
+        });
+        try {
+            window.webkit.messageHandlers.tocUpdate.postMessage(headings);
+        } catch(e) {}
+    }
+
+    // Active heading tracking via IntersectionObserver
+    let headingObserver = null;
+
+    function setupHeadingObserver() {
+        if (headingObserver) headingObserver.disconnect();
+
+        const headingEls = document.querySelectorAll('#content h1, #content h2, #content h3, #content h4, #content h5, #content h6');
+        if (headingEls.length === 0) return;
+
+        headingObserver = new IntersectionObserver((entries) => {
+            let topHeading = null;
+            let topY = Infinity;
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const rect = entry.boundingClientRect;
+                    if (rect.top < topY && rect.top >= -50) {
+                        topY = rect.top;
+                        topHeading = entry.target;
+                    }
+                }
+            });
+            if (topHeading) {
+                try {
+                    window.webkit.messageHandlers.activeHeading.postMessage(topHeading.id);
+                } catch(e) {}
+            }
+        }, {
+            rootMargin: '0px 0px -80% 0px',
+            threshold: [0, 1]
+        });
+
+        headingEls.forEach(el => headingObserver.observe(el));
+    }
 
     // Mermaid theme configs
     const mermaidFont = '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif';
@@ -337,42 +768,123 @@
 
     let currentDarkMode = false;
     let currentMarkdownText = '';
+    let currentFileDir = '';
+    let isFirstRender = true;
+
+    let mermaidLoaded = false;
+    let mermaidLoading = false;
 
     function initMermaid(isDark) {
-        mermaid.initialize(isDark ? darkMermaidConfig : lightMermaidConfig);
+        if (mermaidLoaded && typeof mermaid !== 'undefined') {
+            mermaid.initialize(isDark ? darkMermaidConfig : lightMermaidConfig);
+        }
     }
 
-    initMermaid(false);
+    async function loadMermaidIfNeeded() {
+        if (mermaidLoaded) return true;
+        if (mermaidLoading) {
+            return new Promise(resolve => {
+                const check = setInterval(() => {
+                    if (mermaidLoaded) { clearInterval(check); resolve(true); }
+                }, 50);
+            });
+        }
+
+        mermaidLoading = true;
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'mermaid.min.js';
+            script.onload = () => {
+                mermaidLoaded = true;
+                mermaidLoading = false;
+                mermaid.initialize(currentDarkMode ? darkMermaidConfig : lightMermaidConfig);
+                resolve(true);
+            };
+            script.onerror = (e) => {
+                mermaidLoading = false;
+                console.error('Failed to load mermaid:', e);
+                reject(e);
+            };
+            document.head.appendChild(script);
+        });
+    }
 
     // Main render function — called from Swift via evaluateJavaScript
-    async function renderMarkdown(text) {
+    async function renderMarkdown(text, fileDir) {
         currentMarkdownText = text;
+        currentFileDir = fileDir || '';
         const html = md.render(text);
-        document.getElementById('content').innerHTML = html;
+        const contentEl = document.getElementById('content');
+
+        if (isFirstRender || !contentEl.hasChildNodes()) {
+            // First render: direct innerHTML for speed
+            contentEl.innerHTML = html;
+            isFirstRender = false;
+        } else {
+            // Subsequent renders: morphdom for minimal DOM changes
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = html;
+            morphdom(contentEl, wrapper, { childrenOnly: true });
+        }
+
+        // Resolve relative image paths against the markdown file's directory
+        if (currentFileDir) {
+            document.querySelectorAll('#content img').forEach(img => {
+                const src = img.getAttribute('src');
+                if (src && !src.startsWith('http') && !src.startsWith('file:')
+                    && !src.startsWith('data:') && !src.startsWith('/')) {
+                    img.src = currentFileDir + '/' + src;
+                }
+            });
+        }
+
         await renderMermaidDiagrams();
-        window.scrollTo(0, 0);
+        await renderMath();
+        extractHeadings();
+        setupHeadingObserver();
+        computeStats();
+    }
+
+    function computeStats() {
+        const text = document.getElementById('content').textContent || '';
+        const words = text.split(/\s+/).filter(w => w.length > 0).length;
+        const chars = text.length;
+        const readingTime = Math.max(1, Math.ceil(words / 238));
+        try {
+            window.webkit.messageHandlers.docStats.postMessage({ words: words, chars: chars, readingTime: readingTime });
+        } catch(e) {}
     }
 
     async function renderMermaidDiagrams() {
         const mermaidDivs = document.querySelectorAll('.mermaid');
-        if (mermaidDivs.length > 0) {
-            // Reset any previously rendered diagrams
-            mermaidDivs.forEach(div => {
-                if (div.getAttribute('data-processed')) {
-                    const code = div.getAttribute('data-original') || div.textContent;
-                    div.removeAttribute('data-processed');
-                    div.innerHTML = code;
-                }
-                // Store original source for re-renders
-                if (!div.getAttribute('data-original')) {
-                    div.setAttribute('data-original', div.textContent);
-                }
-            });
-            try {
-                await mermaid.run({ querySelector: '.mermaid' });
-            } catch(e) {
-                console.error('Mermaid rendering error:', e);
+        if (mermaidDivs.length === 0) return;
+
+        await loadMermaidIfNeeded();
+
+        mermaidDivs.forEach(div => {
+            if (div.getAttribute('data-processed')) {
+                const code = div.getAttribute('data-original') || div.textContent;
+                div.removeAttribute('data-processed');
+                div.innerHTML = code;
             }
+            if (!div.getAttribute('data-original')) {
+                div.setAttribute('data-original', div.textContent);
+            }
+        });
+        try {
+            await mermaid.run({ querySelector: '.mermaid' });
+        } catch(e) {
+            console.error('Mermaid rendering error:', e);
+        }
+    }
+
+    function setTheme(name) {
+        document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
+        if (name && name !== 'default') {
+            document.body.classList.add('theme-' + name);
+        }
+        if (currentDarkMode) {
+            document.body.classList.add('dark');
         }
     }
 
@@ -390,8 +902,144 @@
                 // Re-parse and re-render to get fresh mermaid divs
                 const html = md.render(currentMarkdownText);
                 document.getElementById('content').innerHTML = html;
+
+                // Resolve relative image paths against the markdown file's directory
+                if (currentFileDir) {
+                    document.querySelectorAll('#content img').forEach(img => {
+                        const src = img.getAttribute('src');
+                        if (src && !src.startsWith('http') && !src.startsWith('file:')
+                            && !src.startsWith('data:') && !src.startsWith('/')) {
+                            img.src = currentFileDir + '/' + src;
+                        }
+                    });
+                }
+
                 await renderMermaidDiagrams();
+                await renderMath();
             }
+        }
+    }
+
+    function copyCode(btn) {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.textContent).then(() => {
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = 'Copy';
+                btn.classList.remove('copied');
+            }, 2000);
+        });
+    }
+
+    // Find in page
+    function showFindOverlay() {
+        let overlay = document.getElementById('find-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'find-overlay';
+            overlay.innerHTML = '<input type="text" id="find-input" placeholder="Find..." autofocus>' +
+                '<span id="find-count"></span>' +
+                '<button onclick="findNext()">&#9660;</button>' +
+                '<button onclick="findPrev()">&#9650;</button>' +
+                '<button onclick="closeFindOverlay()">&#10005;</button>';
+            document.body.prepend(overlay);
+            document.getElementById('find-input').addEventListener('input', performFind);
+            document.getElementById('find-input').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.shiftKey ? findPrev() : findNext(); }
+                if (e.key === 'Escape') closeFindOverlay();
+            });
+        }
+        overlay.style.display = 'flex';
+        document.getElementById('find-input').focus();
+        document.getElementById('find-input').select();
+    }
+
+    function closeFindOverlay() {
+        const overlay = document.getElementById('find-overlay');
+        if (overlay) overlay.style.display = 'none';
+        clearHighlights();
+    }
+
+    let findMatches = [];
+    let findIndex = -1;
+
+    function performFind() {
+        clearHighlights();
+        const query = document.getElementById('find-input').value;
+        if (!query) { document.getElementById('find-count').textContent = ''; return; }
+
+        const content = document.getElementById('content');
+        const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, null);
+        const textNodes = [];
+        while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+        findMatches = [];
+        const lowerQuery = query.toLowerCase();
+        textNodes.forEach(function(node) {
+            const text = node.textContent.toLowerCase();
+            let idx = text.indexOf(lowerQuery);
+            while (idx !== -1) {
+                findMatches.push({ node: node, index: idx, length: query.length });
+                idx = text.indexOf(lowerQuery, idx + 1);
+            }
+        });
+
+        // Highlight matches (process in reverse to preserve indices)
+        for (let i = findMatches.length - 1; i >= 0; i--) {
+            var m = findMatches[i];
+            var range = document.createRange();
+            range.setStart(m.node, m.index);
+            range.setEnd(m.node, m.index + m.length);
+            var span = document.createElement('mark');
+            span.className = 'find-highlight';
+            range.surroundContents(span);
+        }
+
+        findIndex = findMatches.length > 0 ? 0 : -1;
+        updateFindCount();
+        if (findIndex >= 0) scrollToMatch(findIndex);
+    }
+
+    function clearHighlights() {
+        document.querySelectorAll('.find-highlight').forEach(function(el) {
+            var parent = el.parentNode;
+            parent.replaceChild(document.createTextNode(el.textContent), el);
+            parent.normalize();
+        });
+        findMatches = [];
+        findIndex = -1;
+    }
+
+    function findNext() {
+        if (findMatches.length === 0) return;
+        findIndex = (findIndex + 1) % findMatches.length;
+        updateFindCount();
+        scrollToMatch(findIndex);
+    }
+
+    function findPrev() {
+        if (findMatches.length === 0) return;
+        findIndex = (findIndex - 1 + findMatches.length) % findMatches.length;
+        updateFindCount();
+        scrollToMatch(findIndex);
+    }
+
+    function scrollToMatch(idx) {
+        var highlights = document.querySelectorAll('.find-highlight');
+        highlights.forEach(function(h) { h.classList.remove('find-active'); });
+        if (highlights[idx]) {
+            highlights[idx].classList.add('find-active');
+            highlights[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function updateFindCount() {
+        var countEl = document.getElementById('find-count');
+        if (findMatches.length === 0) {
+            countEl.textContent = document.getElementById('find-input').value ? 'No results' : '';
+        } else {
+            countEl.textContent = (findIndex + 1) + ' of ' + findMatches.length;
         }
     }
 
