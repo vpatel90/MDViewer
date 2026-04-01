@@ -13,6 +13,7 @@ struct CommandPaletteView: View {
     let items: [CommandPaletteItem]
     @State private var query = ""
     @State private var selectedIndex = 0
+    @FocusState private var isSearchFocused: Bool
 
     var filteredItems: [CommandPaletteItem] {
         if query.isEmpty { return items }
@@ -28,6 +29,7 @@ struct CommandPaletteView: View {
                 TextField("Type a command...", text: $query)
                     .textFieldStyle(.plain)
                     .font(.system(size: 15))
+                    .focused($isSearchFocused)
                     .onSubmit { executeSelected() }
             }
             .padding(12)
@@ -83,6 +85,9 @@ struct CommandPaletteView: View {
         .onKeyPress(.escape) {
             isPresented = false
             return .handled
+        }
+        .onAppear {
+            isSearchFocused = true
         }
         .onChange(of: query) { _, _ in
             selectedIndex = 0
