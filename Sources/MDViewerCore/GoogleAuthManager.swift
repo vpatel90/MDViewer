@@ -43,13 +43,15 @@ public class GoogleAuthManager: ObservableObject {
     // Create at: https://console.cloud.google.com/apis/credentials
     //   → OAuth 2.0 Client ID → Desktop app → redirect URI: mdviewer://oauth/callback
     private static let clientID: String = {
-        if let envID = ProcessInfo.processInfo.environment["MDVIEWER_GOOGLE_CLIENT_ID"], !envID.isEmpty {
-            return envID
-        }
-        let configPath = NSString("~/.config/mdviewer/google-client-id").expandingTildeInPath
-        if let fileID = try? String(contentsOfFile: configPath, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines), !fileID.isEmpty {
-            return fileID
-        }
+        if let v = ProcessInfo.processInfo.environment["MDVIEWER_GOOGLE_CLIENT_ID"], !v.isEmpty { return v }
+        let path = NSString("~/.config/mdviewer/google-client-id").expandingTildeInPath
+        if let v = try? String(contentsOfFile: path, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines), !v.isEmpty { return v }
+        return ""
+    }()
+    private static let clientSecret: String = {
+        if let v = ProcessInfo.processInfo.environment["MDVIEWER_GOOGLE_CLIENT_SECRET"], !v.isEmpty { return v }
+        let path = NSString("~/.config/mdviewer/google-client-secret").expandingTildeInPath
+        if let v = try? String(contentsOfFile: path, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines), !v.isEmpty { return v }
         return ""
     }()
     // Redirect URI is set dynamically to http://127.0.0.1:{port} per session
@@ -266,6 +268,7 @@ public class GoogleAuthManager: ObservableObject {
     private func exchangeCodeForTokens(code: String, verifier: String) async throws {
         let params = [
             "client_id": Self.clientID,
+            "client_secret": Self.clientSecret,
             "code": code,
             "code_verifier": verifier,
             "grant_type": "authorization_code",
@@ -293,6 +296,7 @@ public class GoogleAuthManager: ObservableObject {
 
         let params = [
             "client_id": Self.clientID,
+            "client_secret": Self.clientSecret,
             "refresh_token": refreshToken,
             "grant_type": "refresh_token",
         ]
