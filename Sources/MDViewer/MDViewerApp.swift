@@ -4,17 +4,14 @@ import MDViewerCore
 @main
 struct MDViewerApp: App {
     @StateObject private var manager = DocumentManager()
-    @StateObject private var authManager = GoogleAuthManager()
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
         Window("MDViewer", id: "main") {
             ContentView()
                 .environmentObject(manager)
-                .environmentObject(authManager)
                 .onAppear {
                     appDelegate.manager = manager
-                    appDelegate.authManager = authManager
                 }
         }
         .defaultSize(width: 900, height: 700)
@@ -93,7 +90,6 @@ struct MDViewerApp: App {
 @MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
     var manager: DocumentManager?
-    var authManager: GoogleAuthManager?
 
     func application(_ application: NSApplication, open urls: [URL]) {
         NSApp.windows.first { $0.isVisible }?.makeKeyAndOrderFront(nil)

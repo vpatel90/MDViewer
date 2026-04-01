@@ -4,16 +4,10 @@ import UniformTypeIdentifiers
 
 public struct ContentView: View {
     @EnvironmentObject var manager: DocumentManager
-    @EnvironmentObject var authManager: GoogleAuthManager
     @AppStorage("isDarkMode") private var isDarkMode = false
     @AppStorage("sidebarVisible") private var sidebarVisible = true
     @AppStorage("appTheme") private var appTheme = "default"
     @State private var showCommandPalette = false
-    @State private var showGDocURLInput = false
-    @State private var gdocURLInput = ""
-
-    private var docsService: GoogleDocsService { GoogleDocsService(auth: authManager) }
-    private var converter: MarkdownConverter { MarkdownConverter() }
 
     public init() {}
 
@@ -123,27 +117,6 @@ public struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .init("MDViewerCommandPalette"))) { _ in
             showCommandPalette.toggle()
         }
-        .sheet(isPresented: $showGDocURLInput) {
-            VStack(spacing: 16) {
-                Text("Import from Google Doc")
-                    .font(.headline)
-                TextField("Paste Google Doc URL...", text: $gdocURLInput)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 400)
-                    .onSubmit { handleImportWithURL() }
-                HStack {
-                    Button("Cancel") {
-                        gdocURLInput = ""
-                        showGDocURLInput = false
-                    }
-                    .keyboardShortcut(.cancelAction)
-                    Button("Import") { handleImportWithURL() }
-                        .keyboardShortcut(.defaultAction)
-                        .disabled(gdocURLInput.trimmingCharacters(in: .whitespaces).isEmpty)
-                }
-            }
-            .padding(24)
-        }
     }
 
     private var tocSidebar: some View {
@@ -232,30 +205,6 @@ public struct ContentView: View {
             ))
         }
 
-        // Google Docs
-        items.append(CommandPaletteItem(
-            icon: "arrow.down.doc.fill",
-            title: "Import from Google Doc",
-            shortcut: nil,
-            action: { handleImportFromGoogleDoc() }
-        ))
-        if manager.selectedTab != nil {
-            items.append(CommandPaletteItem(
-                icon: "arrow.up.doc.fill",
-                title: "Push to Google Doc",
-                shortcut: nil,
-                action: { handlePushToGoogleDoc() }
-            ))
-        }
-        if authManager.isAuthenticated {
-            items.append(CommandPaletteItem(
-                icon: "person.crop.circle.badge.xmark",
-                title: "Disconnect Google Account",
-                shortcut: nil,
-                action: { Task { try? await authManager.disconnect() } }
-            ))
-        }
-
         // Actions
         items.append(CommandPaletteItem(icon: "doc", title: "Open File...", shortcut: "\u{2318}O",
             action: { manager.openFileDialog() }))
@@ -269,8 +218,22 @@ public struct ContentView: View {
             action: { NotificationCenter.default.post(name: .init("MDViewerExportPDF"), object: manager.selectedTab?.filename) }))
         items.append(CommandPaletteItem(icon: "doc.richtext", title: "Copy as HTML", shortcut: nil,
             action: { NotificationCenter.default.post(name: .init("MDViewerCopyHTML"), object: nil) }))
+        items.append(CommandPaletteItem(icon: "doc.text.image", title: "Copy for Google Docs", shortcut: nil,
+            action: { copyForGoogleDocs() }))
 
         return items
+    }
+
+    private func copyForGoogleDocs() {
+        guard let tab = manager.selectedTab else { return }
+        let parsed = FrontmatterParser.parse(tab.content)
+        let converter = MarkdownConverter()
+        let html = converter.markdownToHTML(parsed.body)
+
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(html, forType: .html)
+        pasteboard.setString(parsed.body, forType: .string)
     }
 
     private func handleDrop(providers: [NSItemProvider]) -> Bool {
@@ -289,134 +252,5 @@ public struct ContentView: View {
             handled = true
         }
         return handled
-    }
-
-    // MARK: - Google Docs Handlers
-
-    private func handleImportFromGoogleDoc() {
-        // If current tab has a gdoc frontmatter link, offer to update
-        if let tab = manager.selectedTab,
-           let gdocURL = tab.gdocURL,
-           let docID = FrontmatterParser.extractDocID(from: gdocURL) {
-            let alert = NSAlert()
-            alert.messageText = "Update from Google Doc?"
-            alert.informativeText = "This will replace the current file content with the latest version from Google Docs."
-            alert.addButton(withTitle: "Update")
-            alert.addButton(withTitle: "Cancel")
-            alert.alertStyle = .informational
-            guard alert.runModal() == .alertFirstButtonReturn else { return }
-
-            Task {
-                do {
-                    try await ensureAuthenticated()
-                    let html = try await docsService.fetchDocHTML(docID: docID)
-                    let markdown = converter.htmlToMarkdown(html)
-                    let updated = FrontmatterParser.setField("gdoc", value: gdocURL, in: markdown)
-                    try updated.write(to: tab.fileURL, atomically: true, encoding: .utf8)
-                } catch {
-                    showError(error)
-                }
-            }
-        } else {
-            gdocURLInput = ""
-            showGDocURLInput = true
-        }
-    }
-
-    private func handleImportWithURL() {
-        let urlString = gdocURLInput.trimmingCharacters(in: .whitespaces)
-        guard let docID = FrontmatterParser.extractDocID(from: urlString) else {
-            let alert = NSAlert()
-            alert.messageText = "Invalid Google Doc URL"
-            alert.informativeText = "Please paste a valid Google Docs URL (e.g. https://docs.google.com/document/d/…/edit)."
-            alert.alertStyle = .warning
-            alert.runModal()
-            return
-        }
-
-        showGDocURLInput = false
-
-        Task {
-            do {
-                try await ensureAuthenticated()
-                let html = try await docsService.fetchDocHTML(docID: docID)
-                let markdown = converter.htmlToMarkdown(html)
-                let withFrontmatter = FrontmatterParser.setField("gdoc", value: urlString, in: markdown)
-
-                let panel = NSSavePanel()
-                panel.allowedContentTypes = [.init(filenameExtension: "md")!]
-                panel.nameFieldStringValue = "Imported Doc.md"
-                guard panel.runModal() == .OK, let saveURL = panel.url else { return }
-
-                try withFrontmatter.write(to: saveURL, atomically: true, encoding: .utf8)
-                manager.openFile(url: saveURL)
-            } catch {
-                showError(error)
-            }
-        }
-    }
-
-    private func handlePushToGoogleDoc() {
-        guard let tab = manager.selectedTab else { return }
-        let parsed = FrontmatterParser.parse(tab.content)
-        let body = parsed.body
-
-        if let gdocURL = parsed.fields["gdoc"],
-           let docID = FrontmatterParser.extractDocID(from: gdocURL) {
-            // Update existing doc
-            let alert = NSAlert()
-            alert.messageText = "Push to Google Doc?"
-            alert.informativeText = "This will update the linked Google Doc with the current markdown content."
-            alert.addButton(withTitle: "Push")
-            alert.addButton(withTitle: "Cancel")
-            alert.alertStyle = .informational
-            guard alert.runModal() == .alertFirstButtonReturn else { return }
-
-            Task {
-                do {
-                    try await ensureAuthenticated()
-                    let html = converter.markdownToHTML(body)
-                    try await docsService.updateDoc(docID: docID, html: html)
-                } catch {
-                    showError(error)
-                }
-            }
-        } else {
-            // Create new doc
-            let alert = NSAlert()
-            alert.messageText = "Create new Google Doc?"
-            alert.informativeText = "This will create a new Google Doc from the current markdown content and link it via frontmatter."
-            alert.addButton(withTitle: "Create")
-            alert.addButton(withTitle: "Cancel")
-            alert.alertStyle = .informational
-            guard alert.runModal() == .alertFirstButtonReturn else { return }
-
-            Task {
-                do {
-                    try await ensureAuthenticated()
-                    let html = converter.markdownToHTML(body)
-                    let docName = tab.filename.replacingOccurrences(of: ".md", with: "")
-                    let newURL = try await docsService.createDoc(name: docName, html: html)
-                    let updated = FrontmatterParser.setField("gdoc", value: newURL, in: tab.content)
-                    try updated.write(to: tab.fileURL, atomically: true, encoding: .utf8)
-                } catch {
-                    showError(error)
-                }
-            }
-        }
-    }
-
-    private func ensureAuthenticated() async throws {
-        if !authManager.isAuthenticated {
-            try await authManager.authenticate()
-        }
-    }
-
-    private func showError(_ error: Error) {
-        let alert = NSAlert()
-        alert.messageText = "Error"
-        alert.informativeText = error.localizedDescription
-        alert.alertStyle = .critical
-        alert.runModal()
     }
 }
