@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -217,8 +218,31 @@ public struct ContentView: View {
             action: { NotificationCenter.default.post(name: .init("MDViewerExportPDF"), object: manager.selectedTab?.filename) }))
         items.append(CommandPaletteItem(icon: "doc.richtext", title: "Copy as HTML", shortcut: nil,
             action: { NotificationCenter.default.post(name: .init("MDViewerCopyHTML"), object: nil) }))
+        items.append(CommandPaletteItem(icon: "doc.text.image", title: "Copy for Google Docs", shortcut: nil,
+            action: { copyForGoogleDocs() }))
+        items.append(CommandPaletteItem(icon: "doc.plaintext", title: "Copy as Markdown", shortcut: nil,
+            action: { copyAsMarkdown() }))
 
         return items
+    }
+
+    private func copyAsMarkdown() {
+        guard let tab = manager.selectedTab else { return }
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(tab.content, forType: .string)
+    }
+
+    private func copyForGoogleDocs() {
+        guard let tab = manager.selectedTab else { return }
+        let parsed = FrontmatterParser.parse(tab.content)
+        let converter = MarkdownConverter()
+        let html = converter.markdownToHTML(parsed.body)
+
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(html, forType: .html)
+        pasteboard.setString(parsed.body, forType: .string)
     }
 
     private func handleDrop(providers: [NSItemProvider]) -> Bool {

@@ -92,7 +92,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var manager: DocumentManager?
 
     func application(_ application: NSApplication, open urls: [URL]) {
-        // Bring existing window to front
         NSApp.windows.first { $0.isVisible }?.makeKeyAndOrderFront(nil)
         for url in urls {
             manager?.openFile(url: url)
