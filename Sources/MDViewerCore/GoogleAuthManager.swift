@@ -7,6 +7,7 @@ import Security
 
 public enum AuthError: LocalizedError {
     case notAuthenticated
+    case missingClientID
     case denied(String)
     case missingVerifier
     case tokenExchangeFailed(String)
@@ -16,6 +17,8 @@ public enum AuthError: LocalizedError {
         switch self {
         case .notAuthenticated:
             "Not authenticated. Please sign in with Google."
+        case .missingClientID:
+            "Google OAuth client ID not configured. Set MDVIEWER_GOOGLE_CLIENT_ID environment variable or create ~/.config/mdviewer/google-client-id"
         case .denied(let reason):
             "Authentication denied: \(reason)"
         case .missingVerifier:
@@ -35,9 +38,22 @@ public class GoogleAuthManager: ObservableObject {
     @Published public var isAuthenticated: Bool
 
     // OAuth configuration
-    private static let clientID = "YOUR_CLIENT_ID.apps.googleusercontent.com"
+    // Set MDVIEWER_GOOGLE_CLIENT_ID env var before building, or create
+    // ~/.config/mdviewer/google-client-id with just the client ID string.
+    // Create at: https://console.cloud.google.com/apis/credentials
+    //   → OAuth 2.0 Client ID → Desktop app → redirect URI: mdviewer://oauth/callback
+    private static let clientID: String = {
+        if let envID = ProcessInfo.processInfo.environment["MDVIEWER_GOOGLE_CLIENT_ID"], !envID.isEmpty {
+            return envID
+        }
+        let configPath = NSString("~/.config/mdviewer/google-client-id").expandingTildeInPath
+        if let fileID = try? String(contentsOfFile: configPath, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines), !fileID.isEmpty {
+            return fileID
+        }
+        return ""
+    }()
     private let redirectURI = "mdviewer://oauth/callback"
-    private let scope = "https://www.googleapis.com/auth/drive.readonly"
+    private let scope = "https://www.googleapis.com/auth/drive.file"
     private let authURL = "https://accounts.google.com/o/oauth2/v2/auth"
     private let tokenURL = "https://oauth2.googleapis.com/token"
     private let revokeURL = "https://oauth2.googleapis.com/revoke"
@@ -63,6 +79,9 @@ public class GoogleAuthManager: ObservableObject {
 
     /// Starts browser-based OAuth 2.0 flow with PKCE.
     public func authenticate() async throws {
+        guard !Self.clientID.isEmpty else {
+            throw AuthError.missingClientID
+        }
         let verifier = Self.generateCodeVerifier()
         let challenge = Self.generateCodeChallenge(from: verifier)
         codeVerifier = verifier
