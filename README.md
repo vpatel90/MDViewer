@@ -37,7 +37,9 @@ A native macOS markdown viewer built for daily use. Beautiful typography, syntax
 
 ### Export & Integration
 - **PDF export** (`Cmd+Shift+E`) — A4 PDF with print-optimized CSS
+- **Copy for Google Docs** — copies styled HTML that pastes into Google Docs with formatting preserved
 - **Copy as HTML** — paste rendered markdown into other apps
+- **Copy as Markdown** — copy the raw markdown source to clipboard
 - **File watching** — auto-refreshes when files are edited externally
 - **Session persistence** — remembers open tabs and selected document across restarts
 - **Drag and drop** — drop `.md` files onto the window to open them
