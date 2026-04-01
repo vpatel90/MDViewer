@@ -98,13 +98,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func application(_ application: NSApplication, open urls: [URL]) {
         NSApp.windows.first { $0.isVisible }?.makeKeyAndOrderFront(nil)
         for url in urls {
-            if url.scheme == "mdviewer" && url.host == "oauth" {
-                Task {
-                    try? await authManager?.handleCallback(url: url)
-                }
-            } else {
-                manager?.openFile(url: url)
-            }
+            manager?.openFile(url: url)
         }
     }
 

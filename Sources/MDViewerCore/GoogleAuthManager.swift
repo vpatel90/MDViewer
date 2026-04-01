@@ -52,7 +52,8 @@ public class GoogleAuthManager: ObservableObject {
         }
         return ""
     }()
-    private let redirectURI = "mdviewer://oauth/callback"
+    // Redirect URI is set dynamically to http://127.0.0.1:{port} per session
+    private var redirectURI: String = ""
     private let scope = "https://www.googleapis.com/auth/drive.file"
     private let authURL = "https://accounts.google.com/o/oauth2/v2/auth"
     private let tokenURL = "https://oauth2.googleapis.com/token"
@@ -77,68 +78,151 @@ public class GoogleAuthManager: ObservableObject {
 
     // MARK: - Public Methods
 
-    /// Starts browser-based OAuth 2.0 flow with PKCE.
+    /// Starts browser-based OAuth 2.0 flow with PKCE using a loopback HTTP server.
     public func authenticate() async throws {
         guard !Self.clientID.isEmpty else {
             throw AuthError.missingClientID
         }
+
         let verifier = Self.generateCodeVerifier()
         let challenge = Self.generateCodeChallenge(from: verifier)
         codeVerifier = verifier
 
-        var components = URLComponents(string: authURL)!
-        components.queryItems = [
-            URLQueryItem(name: "client_id", value: Self.clientID),
-            URLQueryItem(name: "redirect_uri", value: redirectURI),
-            URLQueryItem(name: "response_type", value: "code"),
-            URLQueryItem(name: "scope", value: scope),
-            URLQueryItem(name: "code_challenge", value: challenge),
-            URLQueryItem(name: "code_challenge_method", value: "S256"),
-            URLQueryItem(name: "access_type", value: "offline"),
-            URLQueryItem(name: "prompt", value: "consent"),
-        ]
+        // Start a temporary local HTTP server to receive the OAuth callback
+        let code = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
+            startLoopbackServer { [weak self] result in
+                switch result {
+                case .success(let authCode):
+                    continuation.resume(returning: authCode)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
 
-        guard let url = components.url else {
-            throw AuthError.tokenExchangeFailed("Failed to construct auth URL")
-        }
+            // Build the auth URL with the loopback redirect
+            var components = URLComponents(string: authURL)!
+            components.queryItems = [
+                URLQueryItem(name: "client_id", value: Self.clientID),
+                URLQueryItem(name: "redirect_uri", value: redirectURI),
+                URLQueryItem(name: "response_type", value: "code"),
+                URLQueryItem(name: "scope", value: scope),
+                URLQueryItem(name: "code_challenge", value: challenge),
+                URLQueryItem(name: "code_challenge_method", value: "S256"),
+                URLQueryItem(name: "access_type", value: "offline"),
+                URLQueryItem(name: "prompt", value: "consent"),
+            ]
 
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            pendingContinuation = continuation
-            NSWorkspace.shared.open(url)
-        }
-    }
-
-    /// Handles the OAuth callback URL from the system browser.
-    public func handleCallback(url: URL) async throws {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            resumePending(with: AuthError.tokenExchangeFailed("Invalid callback URL"))
-            return
-        }
-
-        let queryItems = components.queryItems ?? []
-
-        if let error = queryItems.first(where: { $0.name == "error" })?.value {
-            let err = AuthError.denied(error)
-            resumePending(with: err)
-            throw err
-        }
-
-        guard let code = queryItems.first(where: { $0.name == "code" })?.value else {
-            let err = AuthError.tokenExchangeFailed("No authorization code in callback")
-            resumePending(with: err)
-            throw err
-        }
-
-        guard let verifier = codeVerifier else {
-            let err = AuthError.missingVerifier
-            resumePending(with: err)
-            throw err
+            if let url = components.url {
+                NSWorkspace.shared.open(url)
+            }
         }
 
         try await exchangeCodeForTokens(code: code, verifier: verifier)
         codeVerifier = nil
         isAuthenticated = true
-        resumePending(with: nil)
+    }
+
+    // MARK: - Loopback Server
+
+    private var serverSocket: Int32 = -1
+
+    private func startLoopbackServer(completion: @escaping (Result<String, Error>) -> Void) {
+        // Create a TCP socket
+        let sock = socket(AF_INET, SOCK_STREAM, 0)
+        guard sock >= 0 else {
+            completion(.failure(AuthError.tokenExchangeFailed("Failed to create socket")))
+            return
+        }
+
+        var opt: Int32 = 1
+        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &opt, socklen_t(MemoryLayout<Int32>.size))
+
+        // Bind to 127.0.0.1 on a random port (port 0 = OS assigns)
+        var addr = sockaddr_in()
+        addr.sin_family = sa_family_t(AF_INET)
+        addr.sin_port = 0 // random port
+        addr.sin_addr.s_addr = inet_addr("127.0.0.1")
+
+        let bindResult = withUnsafePointer(to: &addr) { ptr in
+            ptr.withMemoryRebound(to: sockaddr.self, capacity: 1) { sockPtr in
+                bind(sock, sockPtr, socklen_t(MemoryLayout<sockaddr_in>.size))
+            }
+        }
+        guard bindResult == 0 else {
+            close(sock)
+            completion(.failure(AuthError.tokenExchangeFailed("Failed to bind socket")))
+            return
+        }
+
+        // Get the assigned port
+        var boundAddr = sockaddr_in()
+        var addrLen = socklen_t(MemoryLayout<sockaddr_in>.size)
+        withUnsafeMutablePointer(to: &boundAddr) { ptr in
+            ptr.withMemoryRebound(to: sockaddr.self, capacity: 1) { sockPtr in
+                getsockname(sock, sockPtr, &addrLen)
+            }
+        }
+        let port = Int(UInt16(bigEndian: boundAddr.sin_port))
+        redirectURI = "http://127.0.0.1:\(port)"
+
+        Darwin.listen(sock, 1)
+        serverSocket = sock
+
+        // Accept connection on a background queue
+        DispatchQueue.global(qos: .userInitiated).async {
+            let client = accept(sock, nil, nil)
+            defer {
+                close(client)
+                close(sock)
+            }
+
+            guard client >= 0 else {
+                DispatchQueue.main.async { completion(.failure(AuthError.tokenExchangeFailed("Failed to accept connection"))) }
+                return
+            }
+
+            // Read the HTTP request
+            var buffer = [UInt8](repeating: 0, count: 4096)
+            let bytesRead = recv(client, &buffer, buffer.count, 0)
+            guard bytesRead > 0 else {
+                DispatchQueue.main.async { completion(.failure(AuthError.tokenExchangeFailed("Empty request"))) }
+                return
+            }
+
+            let request = String(bytes: buffer[0..<bytesRead], encoding: .utf8) ?? ""
+
+            // Parse the query string from "GET /?code=...&scope=... HTTP/1.1"
+            guard let firstLine = request.components(separatedBy: "\r\n").first,
+                  let path = firstLine.components(separatedBy: " ").dropFirst().first,
+                  let urlComponents = URLComponents(string: "http://localhost\(path)") else {
+                let errorResponse = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n<html><body><h2>Error</h2><p>Invalid request.</p></body></html>"
+                _ = send(client, errorResponse, errorResponse.utf8.count, 0)
+                DispatchQueue.main.async { completion(.failure(AuthError.tokenExchangeFailed("Invalid callback request"))) }
+                return
+            }
+
+            let queryItems = urlComponents.queryItems ?? []
+
+            if let error = queryItems.first(where: { $0.name == "error" })?.value {
+                let errorResponse = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body><h2>Authentication Failed</h2><p>\(error)</p><p>You can close this tab.</p></body></html>"
+                _ = send(client, errorResponse, errorResponse.utf8.count, 0)
+                DispatchQueue.main.async { completion(.failure(AuthError.denied(error))) }
+                return
+            }
+
+            guard let code = queryItems.first(where: { $0.name == "code" })?.value else {
+                let errorResponse = "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n<html><body><h2>Error</h2><p>No authorization code received.</p></body></html>"
+                _ = send(client, errorResponse, errorResponse.utf8.count, 0)
+                DispatchQueue.main.async { completion(.failure(AuthError.tokenExchangeFailed("No code in callback"))) }
+                return
+            }
+
+            // Send success response
+            let successResponse = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body><h2>Signed in to MDViewer</h2><p>You can close this tab and return to MDViewer.</p></body></html>"
+            _ = send(client, successResponse, successResponse.utf8.count, 0)
+
+            DispatchQueue.main.async { completion(.success(code)) }
+        }
     }
 
     /// Returns a valid access token, refreshing if needed.
