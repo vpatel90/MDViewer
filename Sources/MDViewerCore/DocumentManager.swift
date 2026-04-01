@@ -105,6 +105,16 @@ public class DocumentManager: ObservableObject {
         guard let index = tabs.firstIndex(where: { $0.id == id }) else { return }
         guard let content = try? String(contentsOf: tabs[index].fileURL, encoding: .utf8) else { return }
         tabs[index].content = content
+        // Directly notify the WebView to re-render (bypasses SwiftUI update chain
+        // which can be unreliable through HSplitView)
+        if id == selectedTabID {
+            let fileDir = tabs[index].fileURL.deletingLastPathComponent().absoluteString
+            NotificationCenter.default.post(
+                name: .init("MDViewerReloadContent"),
+                object: nil,
+                userInfo: ["content": content, "tabID": id, "fileDir": fileDir]
+            )
+        }
     }
 
     public func selectTab(at index: Int) {

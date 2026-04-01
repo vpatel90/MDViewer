@@ -36,6 +36,18 @@ struct MarkdownWebView: NSViewRepresentable {
             webView.loadFileURL(templateURL, allowingReadAccessTo: URL(fileURLWithPath: "/"))
         }
 
+        NotificationCenter.default.addObserver(forName: .init("MDViewerReloadContent"), object: nil, queue: .main) { [weak coordinator = context.coordinator] notification in
+            let info = notification.userInfo
+            let content = info?["content"] as? String
+            let tabID = info?["tabID"] as? UUID
+            let fileDir = info?["fileDir"] as? String
+            MainActor.assumeIsolated {
+                guard let content, let tabID, let fileDir else { return }
+                coordinator?.lastRenderedContent = nil
+                coordinator?.renderContent(content, tabID: tabID, fileDir: fileDir)
+            }
+        }
+
         NotificationCenter.default.addObserver(forName: .init("MDViewerFind"), object: nil, queue: .main) { [weak coordinator = context.coordinator] _ in
             MainActor.assumeIsolated {
                 coordinator?.webView?.evaluateJavaScript("showFindOverlay()") { _, _ in }
@@ -90,7 +102,7 @@ struct MarkdownWebView: NSViewRepresentable {
         var onHeadingsUpdate: (([HeadingItem]) -> Void)?
         var onActiveHeadingChange: ((String?) -> Void)?
         var onStatsUpdate: ((DocumentStats) -> Void)?
-        private var lastRenderedContent: String?
+        var lastRenderedContent: String?
         private var lastDarkMode: Bool?
         private var lastTheme: String?
         private var currentTabID: UUID?
