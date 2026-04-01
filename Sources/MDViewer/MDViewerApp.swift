@@ -72,6 +72,16 @@ struct MDViewerApp: App {
                     manager.selectPreviousTab()
                 }
                 .keyboardShortcut("[", modifiers: .command)
+
+                Divider()
+
+                ForEach(0..<9, id: \.self) { i in
+                    Button("Tab \(i + 1)") {
+                        manager.selectTab(at: i)
+                    }
+                    .keyboardShortcut(KeyEquivalent(Character(String(i + 1))), modifiers: .command)
+                    .disabled(i >= manager.tabs.count)
+                }
             }
         }
     }

@@ -107,6 +107,11 @@ public class DocumentManager: ObservableObject {
         tabs[index].content = content
     }
 
+    public func selectTab(at index: Int) {
+        guard index >= 0 && index < tabs.count else { return }
+        selectedTabID = tabs[index].id
+    }
+
     public func openFileDialog() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [
