@@ -85,17 +85,6 @@ cat > "$APP_DIR/Info.plist" << 'PLIST'
     <true/>
     <key>NSSupportsSuddenTermination</key>
     <true/>
-    <key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleURLName</key>
-            <string>MDViewer OAuth</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>mdviewer</string>
-            </array>
-        </dict>
-    </array>
 </dict>
 </plist>
 PLIST
