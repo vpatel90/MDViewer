@@ -81,6 +81,7 @@ struct MarkdownWebView: NSViewRepresentable {
     }
 
     class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
+
         weak var webView: WKWebView?
         var pendingContent: (String, UUID, String)?
         var pendingDarkMode: Bool?
@@ -142,6 +143,7 @@ struct MarkdownWebView: NSViewRepresentable {
 
             // Skip if same tab + same content (file watcher re-deliver)
             if !isTabSwitch && content == lastRenderedContent { return }
+
 
             // Save scroll position for outgoing tab
             if isTabSwitch, let outgoingID = currentTabID {

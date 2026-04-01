@@ -816,16 +816,10 @@
         const html = md.render(text);
         const contentEl = document.getElementById('content');
 
-        if (isFirstRender || !contentEl.hasChildNodes()) {
-            // First render: direct innerHTML for speed
-            contentEl.innerHTML = html;
-            isFirstRender = false;
-        } else {
-            // Subsequent renders: morphdom for minimal DOM changes
-            const wrapper = document.createElement('div');
-            wrapper.innerHTML = html;
-            morphdom(contentEl, wrapper, { childrenOnly: true });
-        }
+        // Save scroll position, replace content, restore scroll
+        const scrollY = window.pageYOffset;
+        contentEl.innerHTML = html;
+        window.scrollTo(0, scrollY);
 
         // Resolve relative image paths against the markdown file's directory
         if (currentFileDir) {
