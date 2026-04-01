@@ -220,8 +220,17 @@ public struct ContentView: View {
             action: { NotificationCenter.default.post(name: .init("MDViewerCopyHTML"), object: nil) }))
         items.append(CommandPaletteItem(icon: "doc.text.image", title: "Copy for Google Docs", shortcut: nil,
             action: { copyForGoogleDocs() }))
+        items.append(CommandPaletteItem(icon: "doc.plaintext", title: "Copy as Markdown", shortcut: nil,
+            action: { copyAsMarkdown() }))
 
         return items
+    }
+
+    private func copyAsMarkdown() {
+        guard let tab = manager.selectedTab else { return }
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(tab.content, forType: .string)
     }
 
     private func copyForGoogleDocs() {
